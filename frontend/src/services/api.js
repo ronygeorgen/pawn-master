@@ -20,7 +20,7 @@ class ApiService {
     this.client.interceptors.request.use(
       (config) => {
         // Add auth token if available
-        const token = localStorage.getItem('authToken');
+        const token = localStorage.getItem('access');
         if (token) {
           config.headers.Authorization = `Bearer ${token}`;
         }
@@ -40,7 +40,7 @@ class ApiService {
         if (error.response?.status === 401) {
           // Handle unauthorized access
           localStorage.removeItem('authToken');
-          window.location.href = '/login';
+          // window.location.href = '/admin/login';
         }
         return Promise.reject(error);
       }

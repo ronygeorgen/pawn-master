@@ -9,6 +9,7 @@ import DefaultSMSPage from './pages/admin/DefaultSMSPage';
 import CategoriesPage from './pages/admin/CategoriesPage';
 import SMSGroupsPage from './pages/admin/SMSGroupsPage';
 import UserDashboard from './pages/user/UserDashboard';
+import LoginPage from './pages/admin/LoginPage';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
             {/* Admin Routes */}
             <Route path="/admin" element={<AdminLayout />}>
               <Route index element={<Navigate to="/admin/onboarding\" replace />} />
+              <Route path="/admin/login/" element={<LoginPage />} />
               <Route path="onboarding" element={<OnboardingPage />} />
               <Route path="settings/default-sms" element={<DefaultSMSPage />} />
               <Route path="settings/categories" element={<CategoriesPage />} />

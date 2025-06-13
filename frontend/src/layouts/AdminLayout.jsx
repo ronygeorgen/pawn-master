@@ -1,13 +1,18 @@
 import React, { useState } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { Settings, MessageSquare, Tag, Shield, Users, ArrowLeft } from 'lucide-react';
+import Button from '../components/common/Button';
+import { useDispatch, useSelector } from 'react-redux';
+import { logout } from '../store/slices/adminSlice';
 
 const AdminLayout = () => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const isSettingsPage = location.pathname.includes('/settings/');
+  const {isAuthenticated} = useSelector(state=>state.admin)
 
   const settingsOptions = [
     { label: 'SMS Groups', path: '/admin/settings/sms-groups', icon: Users },
@@ -15,6 +20,12 @@ const AdminLayout = () => {
     { label: 'Default SMS', path: '/admin/settings/default-sms', icon: MessageSquare },
     { label: 'Onboarding', path: '/admin/onboarding', icon: Shield },
   ];
+
+  const handleLogout =()=>{
+    dispatch(logout());
+  }
+
+  console.log(isAuthenticated, 'isss')
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -72,6 +83,9 @@ const AdminLayout = () => {
                   </div>
                 )}
               </div>
+              {isAuthenticated && 
+                <Button onClick={handleLogout} variant='secondary'> Logout</Button>
+              }
             </div>
           </div>
         </div>

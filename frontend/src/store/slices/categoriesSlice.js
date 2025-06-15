@@ -52,24 +52,36 @@ const categoriesSlice = createSlice({
       })
       .addCase(fetchCategories.fulfilled, (state, action) => {
         state.loading = false;
-        state.categories = action.payload;
+        state.categories = action.payload?.results;
       })
       .addCase(fetchCategories.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || 'Failed to fetch categories';
       })
+      // Add
       .addCase(createCategory.fulfilled, (state, action) => {
-        state.categories.push(action.payload);
+        state.categories.unshift(action.payload);
       })
+      .addCase(createCategory.rejected, (state, action) => {
+        state.error = action.payload;
+      })
+      // Edit
       .addCase(updateCategory.fulfilled, (state, action) => {
         const index = state.categories.findIndex(cat => cat.id === action.payload.id);
         if (index !== -1) {
           state.categories[index] = action.payload;
         }
       })
+      .addCase(updateCategory.rejected, (state, action) => {
+        state.error = action.payload;
+      })
+      // Remove
       .addCase(deleteCategory.fulfilled, (state, action) => {
         state.categories = state.categories.filter(cat => cat.id !== action.payload);
-      });
+      })
+      .addCase(deleteCategory.rejected, (state, action) => {
+        state.error = action.payload;
+      })
   },
 });
 

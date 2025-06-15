@@ -6,11 +6,11 @@ import Modal from '../../components/common/Modal';
 import Shimmer from '../../components/common/Shimmer';
 
 const CategoriesPage = () => {
-  const { categories, loading, addCategory, editCategory, removeCategory } = useCategories();
+  const { categories, loading, createCategory, updateCategory, deleteCategory } = useCategories();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
   const [formData, setFormData] = useState({
-    name: '',
+    category_name: '',
     description: '',
     color: '#3B82F6',
   });
@@ -24,20 +24,21 @@ const CategoriesPage = () => {
     { value: '#6B7280', label: 'Gray' },
     { value: '#EC4899', label: 'Pink' },
     { value: '#14B8A6', label: 'Teal' },
+    { value: '#FF5733', label: 'Outrageous Orange' },
   ];
 
   const handleOpenModal = (category) => {
     if (category) {
       setEditingCategory(category);
       setFormData({
-        name: category.name,
+        category_name: category.category_name,
         description: category.description,
         color: category.color,
       });
     } else {
       setEditingCategory(null);
       setFormData({
-        name: '',
+        category_name: '',
         description: '',
         color: '#3B82F6',
       });
@@ -49,7 +50,7 @@ const CategoriesPage = () => {
     setIsModalOpen(false);
     setEditingCategory(null);
     setFormData({
-      name: '',
+      category_name: '',
       description: '',
       color: '#3B82F6',
     });
@@ -60,9 +61,9 @@ const CategoriesPage = () => {
     
     try {
       if (editingCategory) {
-        await editCategory(editingCategory.id, formData);
+        await updateCategory(editingCategory.id, formData);
       } else {
-        await addCategory(formData);
+        await createCategory(formData);
       }
       handleCloseModal();
     } catch (error) {
@@ -73,7 +74,7 @@ const CategoriesPage = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this category?')) {
       try {
-        await removeCategory(id);
+        await deleteCategory(id);
       } catch (error) {
         console.error('Failed to delete category:', error);
       }
@@ -152,7 +153,7 @@ const CategoriesPage = () => {
                       style={{ backgroundColor: category.color }}
                     />
                     <div>
-                      <h4 className="font-medium text-gray-900">{category.name}</h4>
+                      <h4 className="font-medium text-gray-900">{category.category_name}</h4>
                       <p className="text-sm text-gray-600">{category.description}</p>
                     </div>
                   </div>
@@ -191,8 +192,8 @@ const CategoriesPage = () => {
             <input
               type="text"
               id="name"
-              value={formData.name}
-              onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+              value={formData.category_name}
+              onChange={(e) => setFormData(prev => ({ ...prev, category_name: e.target.value }))}
               className="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               placeholder="Enter category name"
               required

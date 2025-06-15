@@ -7,6 +7,7 @@ import Button from '../../components/common/Button';
 import LoadingTable from '../../components/common/LoadingTable';
 import Shimmer from '../../components/common/Shimmer';
 import CompanyOnboardingModal from '../../components/admin/CompanyOnboardingModal';
+import { useNavigate } from 'react-router-dom';
 
 const OnboardingPage = () => {
   const [showLocations, setShowLocations] = useState(false);
@@ -16,8 +17,10 @@ const OnboardingPage = () => {
   const [showOnboardedTable, setShowOnboardedTable] = useState(false);
   
   const { locations, selectedLocation, loading: locationsLoading, selectLocation } = useLocations();
-  const { companies, loading: companiesLoading } = useCompanies(selectedLocation?.id);
+  const { companies, loading: companiesLoading } = useCompanies(selectedLocation?.location_id);
   const { categories } = useCategories();
+
+  const navigate = useNavigate();
 
   const handleOnboard = () => {
     setShowLocations(true);
@@ -72,7 +75,7 @@ const OnboardingPage = () => {
             Start by onboarding your locations to manage SMS rates and settings across your organization.
           </p>
           <Button 
-            onClick={handleOnboard}
+            onClick={()=>{navigate('/admin/settings/sms-groups')}}
             size="lg"
             className="px-8 py-3"
             icon={Plus}
@@ -121,7 +124,7 @@ const OnboardingPage = () => {
                     className="p-4 text-left border border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all duration-200 group"
                   >
                     <h4 className="font-medium text-gray-900 group-hover:text-blue-900">
-                      {location.name}
+                      {location.location_name}
                     </h4>
                     <p className="text-sm text-gray-600 mt-1">
                       {location.address}

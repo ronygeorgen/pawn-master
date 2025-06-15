@@ -1,37 +1,28 @@
-import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchCategories, createCategory, updateCategory, deleteCategory } from '../store/slices/categoriesSlice';
+import { useEffect } from 'react';
+import { createCategory, deleteCategory, fetchCategories, updateCategory } from '../store/slices/categoriesSlice';
 
 export const useCategories = () => {
   const dispatch = useDispatch();
-  const { categories, loading, error } = useSelector(
-    (state) => state.categories
-  );
+
+  const categories = useSelector((state) => state.categories.categories);
+  const loading = useSelector((state) => state.categories.loading);
+  const error = useSelector((state) => state.categories.error);
 
   useEffect(() => {
-    if (categories.length === 0) {
-      dispatch(fetchCategories());
-    }
-  }, [dispatch, categories.length]);
+    dispatch(fetchCategories());
+  }, [dispatch]);
 
-  const addCategory = async (categoryData) => {
-    await dispatch(createCategory(categoryData));
-  };
-
-  const editCategory = async (id, data) => {
-    await dispatch(updateCategory({ id, data }));
-  };
-
-  const removeCategory = async (id) => {
-    await dispatch(deleteCategory(id));
-  };
+  const add = (data) => dispatch(createCategory(data));
+  const edit = (id, data) => dispatch(updateCategory({ id, data }));
+  const remove = (id) => dispatch(deleteCategory(id));
 
   return {
     categories,
     loading,
     error,
-    addCategory,
-    editCategory,
-    removeCategory,
+    createCategory: add,
+    updateCategory: edit,
+    deleteCategory: remove,
   };
 };

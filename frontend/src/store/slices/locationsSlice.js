@@ -6,14 +6,19 @@ const initialState = {
   selectedLocation: null,
   loading: false,
   error: null,
+  count: 0,
+  next: null,
+  previous: null,
+  currentPage: 1,
 };
 
 export const fetchLocations = createAsyncThunk(
   'locations/fetchLocations',
-  async () => {
-    return await locationsService.getLocations();
+  async (page = 1) => {
+    return await locationsService.getLocations(page);
   }
 );
+
 
 const locationsSlice = createSlice({
   name: 'locations',
@@ -34,7 +39,10 @@ const locationsSlice = createSlice({
       })
       .addCase(fetchLocations.fulfilled, (state, action) => {
         state.loading = false;
-        state.locations = action.payload;
+        state.locations = action.payload.results;
+        state.count = action.payload.count;
+        state.next = action.payload.next;
+        state.previous = action.payload.previous;
       })
       .addCase(fetchLocations.rejected, (state, action) => {
         state.loading = false;

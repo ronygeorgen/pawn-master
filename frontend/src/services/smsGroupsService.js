@@ -2,33 +2,35 @@ import { apiService } from './api';
 import { mockSMSGroups } from '../data/mockData';
 
 class SMSGroupsService {
-  async getSMSGroups() {
+  async getSMSGroups(page) {
     try {
-      // Replace with actual API call when backend is ready
-      // return await apiService.get('/sms-groups');
-      
-      await new Promise(resolve => setTimeout(resolve, 700));
-      return mockSMSGroups;
+      const res = await apiService.get(`accounts/ghl-auth/?page=${page}`)
+      console.log(res, 'resss');
+      return res;
     } catch (error) {
       console.error('Error fetching SMS groups:', error);
       throw error;
     }
   }
 
-  async updateSMSGroupStatus(id, isActive) {
+  async getSMSGroup(location_id) {
     try {
-      // Replace with actual API call when backend is ready
-      // return await apiService.put(`/sms-groups/${id}/status`, { isActive });
-      
-      await new Promise(resolve => setTimeout(resolve, 500));
-      const group = mockSMSGroups.find(g => g.id === id);
-      if (!group) {
-        throw new Error('SMS Group not found');
-      }
-      return { ...group, isActive };
+      const res = await apiService.get(`accounts/ghl-auth/${location_id}/`)
+      console.log(res, 'resss');
+      return res;
+    } catch (error) {
+      console.error('Error fetching SMS groups:', error);
+      throw error;
+    }
+  }
+
+  async updateSMSGroup(location_id, data) {
+    try {      
+      const res = await apiService.put(`accounts/ghl-auth/${location_id}/`, data)
+      return res
     } catch (error) {
       console.error('Error updating SMS group status:', error);
-      throw error;
+      return error?.response?.data
     }
   }
 }

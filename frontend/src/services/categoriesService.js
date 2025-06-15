@@ -4,59 +4,47 @@ import { mockCategories } from '../data/mockData';
 class CategoriesService {
   async getCategories() {
     try {
-      // Replace with actual API call when backend is ready
-      // return await apiService.get('/categories');
-      
-      await new Promise(resolve => setTimeout(resolve, 600));
-      return mockCategories;
+      const res = await apiService.get('category/categories/')
+      console.log(res, 'resss categories');
+      return res;
     } catch (error) {
       console.error('Error fetching categories:', error);
       throw error;
     }
   }
 
-  async createCategory(categoryData) {
+  async getCategory(id) {
     try {
-      // Replace with actual API call when backend is ready
-      // return await apiService.post('/categories', categoryData);
-      
-      await new Promise(resolve => setTimeout(resolve, 500));
-      const newCategory = {
-        ...categoryData,
-        id: Date.now().toString(),
-      };
-      return newCategory;
+      return await apiService.get(`category/categories/${id}/`);
     } catch (error) {
-      console.error('Error creating category:', error);
+      console.error(`Error fetching category with id ${id}:`, error);
       throw error;
     }
   }
 
+  async createCategory(categoryData) {
+    try {
+      return await apiService.post('category/categories/', categoryData);
+      } catch (error) {
+        console.error('Error creating category:', error);
+        throw error;
+      }
+  }
+
   async updateCategory(id, data) {
     try {
-      // Replace with actual API call when backend is ready
-      // return await apiService.put(`/categories/${id}`, data);
-      
-      await new Promise(resolve => setTimeout(resolve, 500));
-      const existingCategory = mockCategories.find(cat => cat.id === id);
-      if (!existingCategory) {
-        throw new Error('Category not found');
-      }
-      return { ...existingCategory, ...data };
+      return await apiService.put(`category/categories/${id}/`, data);
     } catch (error) {
-      console.error('Error updating category:', error);
+      console.error(`Error updating category ${id}:`, error);
       throw error;
     }
   }
 
   async deleteCategory(id) {
     try {
-      // Replace with actual API call when backend is ready
-      // await apiService.delete(`/categories/${id}`);
-      
-      await new Promise(resolve => setTimeout(resolve, 500));
+      return await apiService.delete(`category/categories/${id}/`);
     } catch (error) {
-      console.error('Error deleting category:', error);
+      console.error(`Error deleting category ${id}:`, error);
       throw error;
     }
   }

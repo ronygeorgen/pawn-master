@@ -2,14 +2,11 @@ import { apiService } from './api';
 import { mockLocations } from '../data/mockData';
 
 class LocationsService {
-  async getLocations() {
+  async getLocations(page = 1) {
     try {
-      // Replace with actual API call when backend is ready
-      // return await apiService.get('/locations');
-      
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      return mockLocations;
+      const res = await apiService.get(`accounts/ghl-auth/?page=${page}`)
+      console.log(res, 'resss');
+      return res;
     } catch (error) {
       console.error('Error fetching locations:', error);
       throw error;

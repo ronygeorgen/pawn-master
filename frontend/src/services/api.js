@@ -33,18 +33,48 @@ class ApiService {
 
     // Response interceptor
     this.client.interceptors.response.use(
-      (response) => {
-        return response;
-      },
-      (error) => {
-        if (error.response?.status === 401) {
-          // Handle unauthorized access
-          localStorage.removeItem('authToken');
-          // window.location.href = '/admin/login';
+      (response) => response,
+      async (error) => {
+        const originalRequest = error.config;
+
+        if (error.response?.status === 401 && !originalRequest._retry) {
+          originalRequest._retry = true;
+
+          try {
+            const newAccessToken = await this.refreshToken();
+            if (newAccessToken) {
+              localStorage.setItem('access', newAccessToken);
+              originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+              return this.client(originalRequest); // Retry original request
+            }
+          } catch (refreshError) {
+            console.error('Refresh token failed:', refreshError);
+            localStorage.removeItem('access');
+            localStorage.removeItem('refresh');
+            window.location.href = '/admin/login';
+          }
         }
         return Promise.reject(error);
       }
     );
+  }
+
+  async refreshToken() {
+    const refresh = localStorage.getItem('refresh');
+
+    if (!refresh) {
+      throw new Error('No refresh token available');
+    }
+
+    try {
+      const response = await axios.post(`${API_BASE_URL}/core/token/refresh/`, {
+        refresh,
+      });
+
+      return response.data.access; // expected { access: 'new_token' }
+    } catch (error) {
+      throw error;
+    }
   }
 
   async get(url, config) {

@@ -190,7 +190,7 @@ const EditSMSGroupModal = ({ isOpen, onClose, smsGroup, onSave, loading }) => {
             <select
               id="category"
               name="category"
-              value={formData.category}
+              value={formData.category.id}
               onChange={handleInputChange}
               className={`form-select ${errors.category ? "error" : ""}`}
             >

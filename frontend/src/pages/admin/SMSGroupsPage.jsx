@@ -79,6 +79,9 @@ const SMSGroupsPage = () => {
     }
   }
 
+  console.log(selectedSMSGroup, 'ldd');
+  
+
   if (loading) {
     return (
       <div className="space-y-6">

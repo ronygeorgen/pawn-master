@@ -34,7 +34,7 @@ export const mockSMSGroups: SMSGroup[] = [
   {
     id: '1',
     name: 'Rojin Tech Finance',
-    address: '123 Main St, Downtown',
+    address: '123 Main St, Downtown111',
     category: 'Finance',
     inboundRate: 0.02,
     outboundRate: 0.05,

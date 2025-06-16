@@ -30,7 +30,7 @@ export const fetchSMSGroup = createAsyncThunk(
 export const updateSMSGroup = createAsyncThunk(
   'smsGroups/updateStatus',
   async ({ location_id, data }) => {
-    console.log(data, 'dd');
+    console.log(data, 'ddrrrr');
     
     return await smsGroupsService.updateSMSGroup(location_id, data);
   }

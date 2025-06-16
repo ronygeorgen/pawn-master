@@ -25,12 +25,19 @@ class SMSGroupsService {
   }
 
   async updateSMSGroup(location_id, data) {
-    try {      
-      const res = await apiService.put(`accounts/ghl-auth/${location_id}/`, data)
-      return res
+    // If category_id is an object, extract only the id
+    if (data.category_id && typeof data.category_id === 'object' && 'id' in data.category_id) {
+      data.category_id = data.category_id.id;
+    }
+  
+    console.log("Sanitized data: ", data);
+  
+    try {
+      const res = await apiService.put(`accounts/ghl-auth/${location_id}/`, data);
+      return res;
     } catch (error) {
       console.error('Error updating SMS group status:', error);
-      return error?.response?.data
+      return error?.response?.data;
     }
   }
 }

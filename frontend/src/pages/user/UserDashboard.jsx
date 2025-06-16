@@ -124,13 +124,13 @@ const UserDashboard = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center text-sm font-medium text-green-600">
-                          <DollarSign className="w-4 h-4 mr-1" />
+                          {/* <DollarSign className="w-4 h-4 mr-1" /> */}
                           {formatCurrency(item.inboundUsage)}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center text-sm font-medium text-blue-600">
-                          <DollarSign className="w-4 h-4 mr-1" />
+                          {/* <DollarSign className="w-4 h-4 mr-1" /> */}
                           {formatCurrency(item.outboundUsage)}
                         </div>
                       </td>

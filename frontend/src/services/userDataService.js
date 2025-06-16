@@ -6,6 +6,8 @@ class UserDataService {
     try {
       // Replace with actual API call when backend is ready
       // return await apiService.post('/user-data', { filters, viewMode });
+
+      console.log("new dataasL ", filters, viewMode)
       
       await new Promise(resolve => setTimeout(resolve, 900));
       

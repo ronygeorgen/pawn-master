@@ -91,6 +91,7 @@ const EditSMSGroupModal = ({ isOpen, onClose, smsGroup, onSave, loading }) => {
     e.preventDefault()
 
     if (validateForm()) {
+      console.log("category12211: ,", formData.category)
       onSave({
         location_id: smsGroup.location_id,
         data: {
@@ -98,7 +99,7 @@ const EditSMSGroupModal = ({ isOpen, onClose, smsGroup, onSave, loading }) => {
           location_name: formData.location_name,
           inbound_rate: Number.parseFloat(formData.inbound_rate),
           outbound_rate: Number.parseFloat(formData.outbound_rate),
-          category: formData.category,
+          category_id: formData.category,
         },
       })
     }

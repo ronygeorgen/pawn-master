@@ -9,6 +9,8 @@ const DefaultSMSPage = () => {
   const dispatch = useDispatch();
   const { rates, loading, error } = useSelector((state) => state.defaultSMS);
   
+  console.log(rates, 'rates');
+  
   const [formData, setFormData] = useState({
     incomingRate: 0,
     outgoingRate: 0,
@@ -23,12 +25,15 @@ const DefaultSMSPage = () => {
   useEffect(() => {
     if (rates) {
       setFormData({
-        incomingRate: rates.incomingRate,
-        outgoingRate: rates.outgoingRate,
+        default_inbound_rate: rates.default_inbound_rate,
+        default_outbound_rate: rates.default_outbound_rate,
         currency: rates.currency,
       });
     }
   }, [rates]);
+
+  console.log(formData, 'data');
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -53,8 +58,8 @@ const DefaultSMSPage = () => {
   const calculateExample = () => {
     const messageCount = 100;
     return {
-      incoming: (formData.incomingRate * messageCount).toFixed(2),
-      outgoing: (formData.outgoingRate * messageCount).toFixed(2),
+      incoming: (formData?.default_inbound_rate * messageCount).toFixed(2),
+      outgoing: (formData?.default_outbound_rate * messageCount).toFixed(2),
     };
   };
 
@@ -141,8 +146,8 @@ const DefaultSMSPage = () => {
                     step="0.001"
                     min="0"
                     id="incomingRate"
-                    value={formData.incomingRate}
-                    onChange={(e) => handleInputChange('incomingRate', parseFloat(e.target.value) || 0)}
+                    value={formData?.default_inbound_rate}
+                    onChange={(e) => handleInputChange('default_inbound_rate', parseFloat(e.target.value) || 0)}
                     className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                     placeholder="0.02"
                   />
@@ -163,8 +168,8 @@ const DefaultSMSPage = () => {
                     step="0.001"
                     min="0"
                     id="outgoingRate"
-                    value={formData.outgoingRate}
-                    onChange={(e) => handleInputChange('outgoingRate', parseFloat(e.target.value) || 0)}
+                    value={formData?.default_outbound_rate}
+                    onChange={(e) => handleInputChange('default_outbound_rate', parseFloat(e.target.value) || 0)}
                     className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                     placeholder="0.05"
                   />
@@ -178,7 +183,7 @@ const DefaultSMSPage = () => {
                 </label>
                 <select
                   id="currency"
-                  value={formData.currency}
+                  value={formData?.currency}
                   onChange={(e) => handleInputChange('currency', e.target.value)}
                   className="block w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 >
@@ -204,24 +209,24 @@ const DefaultSMSPage = () => {
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-600">Incoming SMS</span>
                   <span className="text-lg font-semibold text-green-600">
-                    ${formData.incomingRate.toFixed(3)} {formData.currency}
+                    ${formData?.incomingRate?.toFixed(3)} {formData?.currency}
                   </span>
                 </div>
                 
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-600">Outgoing SMS</span>
                   <span className="text-lg font-semibold text-blue-600">
-                    ${formData.outgoingRate.toFixed(3)} {formData.currency}
+                    ${formData?.outgoingRate?.toFixed(3)} {formData?.currency}
                   </span>
                 </div>
                 
                 <div className="border-t border-gray-200 pt-4">
                   <h5 className="font-medium text-gray-900 mb-2">Example: 100 messages</h5>
                   <p className="text-sm text-gray-600">
-                    Incoming: ${example.incoming}
+                    Incoming: ${example?.incoming}
                   </p>
                   <p className="text-sm text-gray-600">
-                    Outgoing: ${example.outgoing}
+                    Outgoing: ${example?.outgoing}
                   </p>
                 </div>
               </div>

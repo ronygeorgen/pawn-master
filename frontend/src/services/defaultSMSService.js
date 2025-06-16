@@ -1,14 +1,14 @@
 import { apiService } from './api';
-import { mockDefaultSMSRates } from '../data/mockData';
 
 class DefaultSMSService {
   async getDefaultRates() {
     try {
-      // Replace with actual API call when backend is ready
-      // return await apiService.get('/default-sms-rates');
-      
-      await new Promise(resolve => setTimeout(resolve, 500));
-      return mockDefaultSMSRates;
+      const response = await apiService.get('/accounts/sms-config/default-config');
+      return {
+        default_inbound_rate: parseFloat(response.default_inbound_rate),
+        default_outbound_rate: parseFloat(response.default_outbound_rate),
+        currency: response.default_currency,
+      };
     } catch (error) {
       console.error('Error fetching default SMS rates:', error);
       throw error;
@@ -17,11 +17,8 @@ class DefaultSMSService {
 
   async updateDefaultRates(rates) {
     try {
-      // Replace with actual API call when backend is ready
-      // return await apiService.put('/default-sms-rates', rates);
-      
-      await new Promise(resolve => setTimeout(resolve, 600));
-      return rates;
+      const response = await apiService.put('/accounts/sms-config/update-default-config/', rates);
+      return response
     } catch (error) {
       console.error('Error updating default SMS rates:', error);
       throw error;

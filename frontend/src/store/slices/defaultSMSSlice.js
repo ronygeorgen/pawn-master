@@ -7,17 +7,27 @@ const initialState = {
   error: null,
 };
 
+// Thunk to fetch default SMS rates
 export const fetchDefaultSMSRates = createAsyncThunk(
   'defaultSMS/fetchRates',
-  async () => {
-    return await defaultSMSService.getDefaultRates();
+  async (_, { rejectWithValue }) => {
+    try {
+      return await defaultSMSService.getDefaultRates();
+    } catch (error) {
+      return rejectWithValue(error.message || 'Failed to fetch default SMS rates');
+    }
   }
 );
 
+// Thunk to update default SMS rates
 export const updateDefaultSMSRates = createAsyncThunk(
   'defaultSMS/updateRates',
-  async (rates) => {
-    return await defaultSMSService.updateDefaultRates(rates);
+  async (rates, { rejectWithValue }) => {
+    try {
+      return await defaultSMSService.updateDefaultRates(rates);
+    } catch (error) {
+      return rejectWithValue(error.message || 'Failed to update default SMS rates');
+    }
   }
 );
 
@@ -41,10 +51,21 @@ const defaultSMSSlice = createSlice({
       })
       .addCase(fetchDefaultSMSRates.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || 'Failed to fetch default SMS rates';
+        state.error = action.payload;
+      })
+      .addCase(updateDefaultSMSRates.pending, (state) => {
+        state.loading = true;
+        state.error = null;
       })
       .addCase(updateDefaultSMSRates.fulfilled, (state, action) => {
-        state.rates = action.payload;
+        console.log(action.payload, 'payload');
+        
+        state.loading = false;
+        state.rates = action.payload?.config;
+      })
+      .addCase(updateDefaultSMSRates.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
   },
 });

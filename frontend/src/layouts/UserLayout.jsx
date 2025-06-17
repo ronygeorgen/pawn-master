@@ -16,20 +16,16 @@ const UserLayout = () => {
     
     dispatch(setViewMode(newMode));
     
-    // Use current filters with new view mode
-    setTimeout(() => {
-      dispatch(fetchUserData(filters, newMode));
-    }, 0);
+    // Pass filters and new viewMode directly to avoid race conditions
+    dispatch(fetchUserData({ filters, viewMode: newMode }));
   };
 
   const handleApplyFilters = (newFilters) => {
     console.log('Applying filters:', newFilters, 'with viewMode:', viewMode);
     dispatch(setFilters(newFilters));
     
-    // Ensure viewMode is available when fetching
-    setTimeout(() => {
-      dispatch(fetchUserData(newFilters, viewMode));
-    }, 0);
+    // Pass filters and viewMode directly to avoid race conditions
+    dispatch(fetchUserData({ filters: newFilters, viewMode }));
   };
 
   const handleResetFilters = () => {
@@ -43,10 +39,8 @@ const UserLayout = () => {
     console.log('Resetting filters to:', resetData, 'with viewMode:', viewMode);
     dispatch(setFilters(resetData));
     
-    // Ensure viewMode is available when fetching
-    setTimeout(() => {
-      dispatch(fetchUserData(resetData, viewMode));
-    }, 0);
+    // Pass reset filters and current viewMode directly
+    dispatch(fetchUserData({ filters: resetData, viewMode }));
   };
 
   return (

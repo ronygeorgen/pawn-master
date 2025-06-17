@@ -6,8 +6,13 @@ class UserDataService {
     try {
       console.log("Fetching real data with filters:", filters, viewMode);
 
-      // Ensure ISO string format (e.g., 2025-06-01T00:00:00Z)
+      // Add viewMode validation
+      if (!viewMode) {
+        console.warn('ViewMode is undefined, defaulting to company');
+        viewMode = 'company';
+      }
 
+      // Ensure ISO string format (e.g., 2025-06-01T00:00:00Z)
       const formatToISO = (dateStr, fallbackDate) => {
         const date = dateStr ? new Date(dateStr) : fallbackDate;
         return date.toISOString();
@@ -17,25 +22,35 @@ class UserDataService {
       const fiveYearsAgo = new Date();
       fiveYearsAgo.setFullYear(now.getFullYear() - 5);
 
+      console.log('Filters from service:', filters);
+      console.log('ViewMode from service:', viewMode);
+      
       const payload = {
         view_type: viewMode,
         date_range: {
-          start: formatToISO(filters.dateRange?.start, fiveYearsAgo),
-          end: formatToISO(filters.dateRange?.end, now),
+          start: formatToISO(filters?.dateRange?.start, fiveYearsAgo),
+          end: formatToISO(filters?.dateRange?.end, now),
         },
+        // Fix category handling - check for both id and category_name
+        ...(filters?.category?.id && { category: Number(filters.category.id) }),
+        // Fix company handling - ensure company_id is used correctly
+        ...(filters?.company?.id && { company_id: filters.company.id }),
       };
+
+      console.log('Payload being sent:', payload);
 
       const response = await apiService.post('/accounts/analytics/usage-analytics/', payload);
       const rawData = response.data || [];
 
-      console.log("responsel:", response)
+      console.log("API Response:", response);
+      console.log("Raw data received:", rawData);
 
       let transformedData = [];
-
+      
       if (viewMode === 'account') {
         transformedData = rawData.map((item, index) => ({
           id: (index + 1).toString(),
-          company: item.company_name ?? 'Unknown Company',
+          company: item.company_name,
           location: item.location_name,
           inboundSegment: item.total_inbound_segments.toString(),
           outboundSegment: item.total_outbound_segments.toString(),
@@ -43,7 +58,7 @@ class UserDataService {
           messageCountOutbound: item.total_outbound_messages,
           inboundUsage: parseFloat(item.total_inbound_usage),
           outboundUsage: parseFloat(item.total_outbound_usage),
-          category: 'General',
+          category: item.category_name || 'General', // Use actual category from API
         }));
       } else if (viewMode === 'company') {
         transformedData = rawData.map((item, index) => ({
@@ -56,28 +71,17 @@ class UserDataService {
           messageCountOutbound: item.total_outbound_messages,
           inboundUsage: parseFloat(item.total_inbound_usage),
           outboundUsage: parseFloat(item.total_outbound_usage),
-          category: 'General',
+          category: item.category_name || 'General', // Use actual category from API
         }));
       }
 
-      // Optional frontend filtering
-      // if (filters.company) {
-      //   transformedData = transformedData.filter(item =>
-      //     item.company.toLowerCase().includes(filters.company.toLowerCase())
-      //   );
-      // }
-
-      // if (filters.category) {
-      //   transformedData = transformedData.filter(item =>
-      //     item.category.toLowerCase().includes(filters.category.toLowerCase())
-      //   );
-      // }
-      
-      console.log("new data set filtered: ", transformedData)
+      console.log("Transformed data:", transformedData);
+      console.log("Number of records:", transformedData.length);
 
       return transformedData;
     } catch (error) {
       console.error('Error fetching user data:', error);
+      console.error('Error details:', error.response?.data);
       throw error;
     }
   }

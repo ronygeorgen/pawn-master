@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Outlet, Link } from 'react-router-dom';
 import { BarChart3, Filter } from 'lucide-react';
-import { setViewMode, setFilters } from '../store/slices/userDataSlice';
+import { setViewMode, setFilters, fetchUserData } from '../store/slices/userDataSlice';
 import FilterModal from '../components/common/FilterModal';
 
 const UserLayout = () => {
@@ -12,20 +12,41 @@ const UserLayout = () => {
 
   const handleViewModeToggle = () => {
     const newMode = viewMode === 'company' ? 'account' : 'company';
+    console.log('Switching view mode from', viewMode, 'to', newMode);
+    
     dispatch(setViewMode(newMode));
+    
+    // Use current filters with new view mode
+    setTimeout(() => {
+      dispatch(fetchUserData(filters, newMode));
+    }, 0);
   };
 
   const handleApplyFilters = (newFilters) => {
+    console.log('Applying filters:', newFilters, 'with viewMode:', viewMode);
     dispatch(setFilters(newFilters));
+    
+    // Ensure viewMode is available when fetching
+    setTimeout(() => {
+      dispatch(fetchUserData(newFilters, viewMode));
+    }, 0);
   };
 
   const handleResetFilters = () => {
+    // Match the structure used in FilterModal
     const resetData = {
-      company: '',
-      category: '',
+      company: { id: null, company_name: '' },
+      category: { id: null, category_name: '' },
       dateRange: { start: '', end: '' },
     };
+    
+    console.log('Resetting filters to:', resetData, 'with viewMode:', viewMode);
     dispatch(setFilters(resetData));
+    
+    // Ensure viewMode is available when fetching
+    setTimeout(() => {
+      dispatch(fetchUserData(resetData, viewMode));
+    }, 0);
   };
 
   return (

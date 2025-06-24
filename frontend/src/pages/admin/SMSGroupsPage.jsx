@@ -11,6 +11,7 @@ import EditSMSGroupModal from '../../components/admin/EditSMSGroupModal';
 const SMSGroupsPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedSMSGroup, setSelectedSMSGroup] = useState(null)
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
   
   const dispatch = useDispatch();
   const { smsGroups, selectedsmsGroup, loading, selectsmsGroup, success } = useSMSGroups();  
@@ -52,7 +53,7 @@ const SMSGroupsPage = () => {
   };
 
   const handleOnboard = ()=>{
-    window.location.href = "http://56.228.36.160/api/core/auth/connect/";
+    window.location.href = `${API_BASE_URL}core/auth/connect/`;
   }
 
   const handleEditClick = (smsGroup) => {

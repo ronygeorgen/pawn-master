@@ -31,6 +31,17 @@ export const updateDefaultSMSRates = createAsyncThunk(
   }
 );
 
+export const BulkupdateDefaultSMSRates = createAsyncThunk(
+  'defaultSMS/bulkupdateRates',
+  async (rates, { rejectWithValue }) => {
+    try {
+      return await defaultSMSService.BulkupdateDefaultRates(rates);
+    } catch (error) {
+      return rejectWithValue(error.message || 'Failed to update default SMS rates');
+    }
+  }
+);
+
 const defaultSMSSlice = createSlice({
   name: 'defaultSMS',
   initialState,
@@ -64,6 +75,21 @@ const defaultSMSSlice = createSlice({
         state.rates = action.payload?.config;
       })
       .addCase(updateDefaultSMSRates.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      .addCase(BulkupdateDefaultSMSRates.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(BulkupdateDefaultSMSRates.fulfilled, (state, action) => {
+        console.log(action.payload, 'payload');
+        
+        state.loading = false;
+        state.rates = action.payload;
+      })
+      .addCase(BulkupdateDefaultSMSRates.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

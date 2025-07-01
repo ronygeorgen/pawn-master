@@ -183,6 +183,33 @@ const SMSGroupsPage = () => {
                     </p>
                   </div>
                 </div>
+
+                <div className="grid grid-cols-2 gap-4 mb-4">
+                  <div>
+                    <p className="text-xs text-gray-500">Outbound Call Rate</p>
+                    <p className="text-sm font-semibold text-green-600 flex items-center">
+                      <DollarSign className="w-3 h-3" />
+                      {smsGroup?.outbound_call_rate}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500">Inbound Call Rate</p>
+                    <p className="text-sm font-semibold text-blue-600 flex items-center">
+                      <DollarSign className="w-3 h-3" />
+                      {smsGroup?.inbound_call_rate}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 mb-4">
+                  <div>
+                    <p className="text-xs text-gray-500">Call Price Ratio</p>
+                    <p className="text-sm font-semibold text-green-600 flex items-center">
+                      <DollarSign className="w-3 h-3" />
+                      {smsGroup?.call_price_ratio? smsGroup?.call_price_ratio: 'null'}
+                    </p>
+                  </div>
+                </div>
                 
                 <div className="flex space-x-2">
                   <Button

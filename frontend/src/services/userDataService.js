@@ -59,6 +59,7 @@ class UserDataService {
           inboundUsage: parseFloat(item.total_inbound_usage),
           outboundUsage: parseFloat(item.total_outbound_usage),
           category: item.category_name || 'General', // Use actual category from API
+          total_usage: item.total_usage
         }));
       } else if (viewMode === 'company') {
         transformedData = rawData.map((item, index) => ({
@@ -72,6 +73,7 @@ class UserDataService {
           inboundUsage: parseFloat(item.total_inbound_usage),
           outboundUsage: parseFloat(item.total_outbound_usage),
           category: item.category_name || 'General', // Use actual category from API
+          total_usage: item.total_usage
         }));
       }
 

@@ -7,8 +7,9 @@ import { useCategories } from "../../hooks/useCategories"
 const EditSMSGroupModal = ({ isOpen, onClose, smsGroup, onSave, loading }) => {
   const [formData, setFormData] = useState({
     company_name: "",
-    inbound_rate: "",
-    outbound_rate: "",
+    outbound_call_rate: "",
+    inbound_call_rate: "",
+    call_price_ratio:'',
     category: "",
   })
 
@@ -100,6 +101,9 @@ const EditSMSGroupModal = ({ isOpen, onClose, smsGroup, onSave, loading }) => {
           inbound_rate: Number.parseFloat(formData.inbound_rate),
           outbound_rate: Number.parseFloat(formData.outbound_rate),
           category_id: formData.category,
+          inbound_call_rate:formData.inbound_call_rate,
+          outbound_call_rate: formData.outbound_call_rate,
+          call_price_ratio: formData?.call_price_ratio
         },
       })
     }
@@ -145,7 +149,7 @@ const EditSMSGroupModal = ({ isOpen, onClose, smsGroup, onSave, loading }) => {
             {errors.company_name && <span className="error-message">{errors.company_name}</span>}
           </div>
 
-          <div className="form-row">
+          {/* <div className="form-row">
             <div className="form-group">
               <label htmlFor="inbound_rate" className="form-label">
                 Inbound Rate ($)
@@ -181,6 +185,60 @@ const EditSMSGroupModal = ({ isOpen, onClose, smsGroup, onSave, loading }) => {
               />
               {errors.outbound_rate && <span className="error-message">{errors.outbound_rate}</span>}
             </div>
+          </div> */}
+
+          <div className="form-group">
+              <label htmlFor="outbound_call_rate" className="form-label">
+                Outbound Call Rate ($)
+              </label>
+              <input
+                type="number"
+                id="outbound_call_rate"
+                name="outbound_call_rate"
+                value={formData.outbound_call_rate}
+                onChange={handleInputChange}
+                className={`form-input ${errors.outbound_call_rate ? "error" : ""}`}
+                placeholder="0.00"
+                step="any"
+                min="0"
+              />
+              {errors.outbound_call_rate && <span className="error-message">{errors.outbound_call_rate}</span>}
+          </div>
+
+          <div className="form-group">
+              <label htmlFor="inbound_call_rate" className="form-label">
+                Inbound Call Rate ($)
+              </label>
+              <input
+                type="number"
+                id="inbound_call_rate"
+                name="inbound_call_rate"
+                value={formData.inbound_call_rate}  
+                onChange={handleInputChange}
+                className={`form-input ${errors.inbound_call_rate ? "error" : ""}`}
+                placeholder="0.00"
+                step="any"
+                min="0"
+              />
+              {errors.inbound_call_rate && <span className="error-message">{errors.inbound_call_rate}</span>}
+          </div>
+
+          <div className="form-group">
+              <label htmlFor="call_price_ratio" className="form-label">
+                Call Price Ratio ($)
+              </label>
+              <input
+                type="number"
+                id="call_price_ratio"
+                name="call_price_ratio"
+                value={formData.call_price_ratio}  
+                onChange={handleInputChange}
+                className={`form-input ${errors.call_price_ratio ? "error" : ""}`}
+                placeholder="0.00"
+                step="any"
+                min="0"
+              />
+              {errors.call_price_ratio && <span className="error-message">{errors.call_price_ratio}</span>}
           </div>
 
           <div className="form-group">
@@ -190,7 +248,7 @@ const EditSMSGroupModal = ({ isOpen, onClose, smsGroup, onSave, loading }) => {
             <select
               id="category"
               name="category"
-              value={formData.category.id}
+              value={formData.category?.id}
               onChange={handleInputChange}
               className={`form-select ${errors.category ? "error" : ""}`}
             >

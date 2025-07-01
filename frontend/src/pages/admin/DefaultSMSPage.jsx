@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { MessageSquare, DollarSign } from 'lucide-react';
-import { fetchDefaultSMSRates, updateDefaultSMSRates } from '../../store/slices/defaultSMSSlice';
+import { BulkupdateDefaultSMSRates, fetchDefaultSMSRates, updateDefaultSMSRates } from '../../store/slices/defaultSMSSlice';
 import Button from '../../components/common/Button';
 import Shimmer from '../../components/common/Shimmer';
 
@@ -27,6 +27,8 @@ const DefaultSMSPage = () => {
       setFormData({
         default_inbound_rate: rates.default_inbound_rate,
         default_outbound_rate: rates.default_outbound_rate,
+        default_call_outbound_rate:rates?.default_call_outbound_rate,
+        default_call_inbound_rate: rates?.default_call_inbound_rate,
         currency: rates.currency,
       });
     }
@@ -40,7 +42,7 @@ const DefaultSMSPage = () => {
     setIsSubmitting(true);
     
     try {
-      await dispatch(updateDefaultSMSRates(formData));
+        await dispatch(updateDefaultSMSRates(formData));
     } catch (error) {
       console.error('Failed to update rates:', error);
     } finally {
@@ -143,7 +145,7 @@ const DefaultSMSPage = () => {
                   </div>
                   <input
                     type="number"
-                    step="0.001"
+                    step="any"
                     min="0"
                     id="incomingRate"
                     value={formData?.default_inbound_rate}
@@ -165,11 +167,55 @@ const DefaultSMSPage = () => {
                   </div>
                   <input
                     type="number"
-                    step="0.001"
+                    step="any"
                     min="0"
                     id="outgoingRate"
                     value={formData?.default_outbound_rate}
                     onChange={(e) => handleInputChange('default_outbound_rate', parseFloat(e.target.value) || 0)}
+                    className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    placeholder="0.05"
+                  />
+                </div>
+                <p className="text-xs text-gray-500 mt-1">Cost per outgoing message</p>
+              </div>
+
+              <div>
+                <label htmlFor="default_call_outbound_rate" className="block text-sm font-medium text-gray-700 mb-2">
+                  Call Outbound Rate
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <DollarSign className="h-5 w-5 text-gray-400" />
+                  </div>
+                  <input
+                    type="number"
+                    step="any"
+                    min="0"
+                    id="default_call_outbound_rate"
+                    value={formData?.default_call_outbound_rate}
+                    onChange={(e) => handleInputChange('default_call_outbound_rate', parseFloat(e.target.value) || 0)}
+                    className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    placeholder="0.05"
+                  />
+                </div>
+                <p className="text-xs text-gray-500 mt-1">Cost per outgoing message</p>
+              </div>
+
+              <div>
+                <label htmlFor="default_call_inbound_rate" className="block text-sm font-medium text-gray-700 mb-2">
+                  Call Inbound Rate
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <DollarSign className="h-5 w-5 text-gray-400" />
+                  </div>
+                  <input
+                    type="number"
+                    step="any"
+                    min="0"
+                    id="default_call_inbound_rate"
+                    value={formData?.default_call_inbound_rate}
+                    onChange={(e) => handleInputChange('default_call_inbound_rate', parseFloat(e.target.value) || 0)}
                     className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                     placeholder="0.05"
                   />
@@ -193,13 +239,16 @@ const DefaultSMSPage = () => {
                 </select>
               </div>
               
-              <Button
-                type="submit"
-                loading={isSubmitting}
-                className="w-full sm:w-auto"
-              >
-                Save Changes
-              </Button>
+              <div className="flex flex-col sm:flex-row gap-3 w-full">
+                <Button
+                  type="submit"
+                  loading={isSubmitting}
+                  className="h-fit sm:w-auto"
+                >
+                  Save Changes
+                </Button>
+              </div>
+
             </div>
             
             <div className="bg-gray-50 rounded-lg p-6">

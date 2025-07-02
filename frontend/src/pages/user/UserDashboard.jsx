@@ -131,7 +131,7 @@ const UserDashboard = () => {
                       <td className="px-4 py-3">{item.call_data?.total_inbound_call_duration}</td>
                       <td className="px-4 py-3">{item.call_data?.total_outbound_call_duration}</td>
                       <td className="px-4 py-3">{item.call_data?.total_inbound_call_minutes}</td>
-                      <td className="px-4 py-3">{item.call_data?.total_outbound_call_duration}</td>
+                      <td className="px-4 py-3">{item.call_data?.total_outbound_call_minutes}</td>
                       <td className="px-4 py-3">{item.call_data?.call_inbound_usage}</td>
                       <td className={`px-4 py-3 ${viewMode==='company'&&'border-r border-gray-300'}`}>{item.call_data?.call_outbound_usage}</td>
                       {viewMode === 'account' &&

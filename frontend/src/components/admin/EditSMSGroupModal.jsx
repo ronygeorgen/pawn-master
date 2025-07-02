@@ -98,11 +98,7 @@ const EditSMSGroupModal = ({ isOpen, onClose, smsGroup, onSave, loading }) => {
         data: {
           company_name:formData.company_name,
           location_name: formData.location_name,
-          inbound_rate: Number.parseFloat(formData.inbound_rate),
-          outbound_rate: Number.parseFloat(formData.outbound_rate),
           category_id: formData.category,
-          inbound_call_rate:formData.inbound_call_rate,
-          outbound_call_rate: formData.outbound_call_rate,
           call_price_ratio: formData?.call_price_ratio
         },
       })
@@ -187,7 +183,7 @@ const EditSMSGroupModal = ({ isOpen, onClose, smsGroup, onSave, loading }) => {
             </div>
           </div> */}
 
-          <div className="form-group">
+          {/* <div className="form-group">
               <label htmlFor="outbound_call_rate" className="form-label">
                 Outbound Call Rate ($)
               </label>
@@ -221,7 +217,7 @@ const EditSMSGroupModal = ({ isOpen, onClose, smsGroup, onSave, loading }) => {
                 min="0"
               />
               {errors.inbound_call_rate && <span className="error-message">{errors.inbound_call_rate}</span>}
-          </div>
+          </div> */}
 
           <div className="form-group">
               <label htmlFor="call_price_ratio" className="form-label">

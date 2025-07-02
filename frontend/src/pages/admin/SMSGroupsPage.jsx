@@ -170,14 +170,14 @@ const SMSGroupsPage = () => {
                 
                 <div className="grid grid-cols-2 gap-4 mb-4">
                   <div>
-                    <p className="text-xs text-gray-500">Inbound Rate</p>
+                    <p className="text-xs text-gray-500">Inbound SMS Rate</p>
                     <p className="text-sm font-semibold text-green-600 flex items-center">
                       <DollarSign className="w-3 h-3" />
                       {smsGroup?.inbound_rate}
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500">Outbound Rate</p>
+                    <p className="text-xs text-gray-500">Outbound SMS Rate</p>
                     <p className="text-sm font-semibold text-blue-600 flex items-center">
                       <DollarSign className="w-3 h-3" />
                       {smsGroup?.outbound_rate}

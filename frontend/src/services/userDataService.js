@@ -44,43 +44,8 @@ class UserDataService {
 
       console.log("API Response:", response);
       console.log("Raw data received:", rawData);
-
-      let transformedData = [];
       
-      if (viewMode === 'account') {
-        transformedData = rawData.map((item, index) => ({
-          id: (index + 1).toString(),
-          company: item.company_name,
-          location: item.location_name,
-          inboundSegment: item.total_inbound_segments.toString(),
-          outboundSegment: item.total_outbound_segments.toString(),
-          messageCountInbound: item.total_inbound_messages,
-          messageCountOutbound: item.total_outbound_messages,
-          inboundUsage: parseFloat(item.total_inbound_usage),
-          outboundUsage: parseFloat(item.total_outbound_usage),
-          category: item.category_name || 'General', // Use actual category from API
-          total_usage: item.total_usage
-        }));
-      } else if (viewMode === 'company') {
-        transformedData = rawData.map((item, index) => ({
-          id: (index + 1).toString(),
-          company: item.company_name,
-          location: `(${item.locations_count} locations)`,
-          inboundSegment: item.total_inbound_segments.toString(),
-          outboundSegment: item.total_outbound_segments.toString(),
-          messageCountInbound: item.total_inbound_messages,
-          messageCountOutbound: item.total_outbound_messages,
-          inboundUsage: parseFloat(item.total_inbound_usage),
-          outboundUsage: parseFloat(item.total_outbound_usage),
-          category: item.category_name || 'General', // Use actual category from API
-          total_usage: item.total_usage
-        }));
-      }
-
-      console.log("Transformed data:", transformedData);
-      console.log("Number of records:", transformedData.length);
-
-      return transformedData;
+      return rawData;
     } catch (error) {
       console.error('Error fetching user data:', error);
       console.error('Error details:', error.response?.data);

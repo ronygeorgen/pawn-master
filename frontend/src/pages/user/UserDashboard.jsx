@@ -50,101 +50,114 @@ const UserDashboard = () => {
               columns={viewMode === 'company' ? 7 : 8} 
             />
           ) : (
-            <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
-              <table className="min-w-full divide-y divide-gray-300">
+            <div className="overflow-x-auto overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+              <table className="min-w-full divide-y divide-gray-300 text-sm">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Company
-                    </th>
+                    <th rowSpan={2} className="px-6 py-3 text-left font-semibold text-gray-600">Company</th>
                     {viewMode === 'account' && (
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Location
-                      </th>
+                      <th rowSpan={2} className="px-6 py-3 text-left font-semibold text-gray-600">Location</th>
                     )}
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Inbound Segment
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Outbound Segment
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Messages In
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Messages Out
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Inbound Usage
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Outbound Usage
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Total Usage
-                    </th>
+                    <th colSpan={viewMode==='account'?9:6} className="text-center font-semibold text-blue-700 border-l border-gray-300 border-r py-2 border-b">SMS Data</th>
+                    <th colSpan={viewMode==='account'? 10:8} className="text-center font-semibold text-green-700 border-r border-gray-300 border-b">Call Data</th>
+                    <th colSpan={3} className="text-center font-semibold text-gray-700">Totals</th>
+                  </tr>
+                  <tr className="text-sm text-gray-500 font-medium">
+                    {/* SMS Data */}
+                    <th className="px-4 py-2 border-l border-gray-300">Inbound Segments</th>
+                    <th className="px-4 py-2">Outbound Segments</th>
+                    <th className="px-4 py-2">Messages In</th>
+                    <th className="px-4 py-2">Messages Out</th>
+                    <th className="px-4 py-2">Inbound Usage</th>
+                    <th className={`px-4 py-2 ${viewMode==='company'&&'border-r border-gray-300'}`}>Outbound Usage</th>
+                    {viewMode==='account'&&
+                      <>
+                        <th className="px-4 py-2">Inbound Rate</th>
+                        <th className="px-4 py-2 ">Outbound Rate</th>
+                        <th className="px-4 py-2 border-r border-gray-300">Total SMS Usage</th>
+                      </>
+                    }
+
+                    {/* Call Data */}
+                    <th className="px-4 py-2">Inbound Calls</th>
+                    <th className="px-4 py-2">Outbound Calls</th>
+                    <th className="px-4 py-2">Inbound Duration</th>
+                    <th className="px-4 py-2">Outbound Duration</th>
+                    <th className="px-4 py-2">Inbound Minutes</th>
+                    <th className="px-4 py-2">Outbound Minutes</th>
+                    <th className="px-4 py-2">Inbound Usage</th>
+                    <th className={`px-4 py-2 ${viewMode==='company'&&'border-r border-gray-300'}`}>Outbound Usage</th>
+                    {viewMode === 'account' &&
+                      <>
+                        <th className="px-4 py-2">Inbound Rate</th>
+                        <th className="px-4 py-2 border-r border-gray-300">Outbound Rate</th>
+                      </>
+                    }
+                    {/* <th className="px-4 py-2 border-r border-gray-300">Total Call Usage</th> */}
+
+                    {/* Totals */}
+                    <th className="px-4 py-2">Inbound Usage</th>
+                    <th className="px-4 py-2">Outbound Usage</th>
+                    <th className="px-4 py-2">Total Usage</th>
                   </tr>
                 </thead>
+
                 <tbody className="divide-y divide-gray-200 bg-white">
-                  {data.map((item) => (
-                    <tr key={item.id} className="hover:bg-gray-50 transition-colors duration-150">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <Building2 className="w-5 h-5 text-gray-400 mr-3" />
-                          <div>
-                            <div className="text-sm font-medium text-gray-900">
-                              {item.company}
-                            </div>
-                            <div className="text-xs text-gray-500">
-                              {item.category}
-                            </div>
-                          </div>
-                        </div>
-                      </td>
+                  {data.map((item, idx) => (
+                    <tr key={idx} className="hover:bg-gray-50 transition">
+                      <td className="px-6 py-3 font-medium text-gray-900">{item?.company_name || 'Nil'}</td>
                       {viewMode === 'account' && (
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center text-sm text-gray-900">
-                            <MapPin className="w-4 h-4 text-gray-400 mr-2" />
-                            {item.location}
-                          </div>
-                        </td>
+                        <td className="px-6 py-3 text-gray-700">{item?.location_name}</td>
                       )}
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                          {item.inboundSegment}
-                        </span>
+
+                      {/* SMS Data */}
+                      <td className="px-4 py-3 border-l border-gray-300">{item.sms_data?.total_inbound_segments}</td>
+                      <td className="px-4 py-3">{item.sms_data?.total_outbound_segments}</td>
+                      <td className="px-4 py-3">{item.sms_data?.total_inbound_messages}</td>
+                      <td className="px-4 py-3">{item.sms_data?.total_outbound_messages}</td>
+                      <td className="px-4 py-3">{item.sms_data?.sms_inbound_usage}</td>
+                      <td className={`px-4 py-2 ${viewMode==='company'&&'border-r border-gray-300'}`}>{item.sms_data?.sms_outbound_usage}</td>
+                      {viewMode==='account'&&
+                        <>
+                          <td className="px-4 py-3">{item.sms_data?.sms_inbound_rate}</td>
+                          <td className="px-4 py-3 ">{item.sms_data?.sms_outbound_rate}</td>
+                          <td className="px-4 py-3 border-r border-gray-300">{formatCurrency(item.sms_data?.total_sms_usage)}</td>
+                        </>
+                      }
+
+                      {/* Call Data */}
+                      <td className="px-4 py-3">{item.call_data?.total_inbound_calls}</td>
+                      <td className="px-4 py-3">{item.call_data?.total_outbound_calls}</td>
+                      <td className="px-4 py-3">{item.call_data?.total_inbound_call_duration}</td>
+                      <td className="px-4 py-3">{item.call_data?.total_outbound_call_duration}</td>
+                      <td className="px-4 py-3">{item.call_data?.total_inbound_call_minutes}</td>
+                      <td className="px-4 py-3">{item.call_data?.total_outbound_call_duration}</td>
+                      <td className="px-4 py-3">{item.call_data?.call_inbound_usage}</td>
+                      <td className={`px-4 py-3 ${viewMode==='company'&&'border-r border-gray-300'}`}>{item.call_data?.call_outbound_usage}</td>
+                      {viewMode === 'account' &&
+                        <>
+                          <td className="px-4 py-3">{item.call_data?.call_inbound_rate}</td>
+                          <td className="px-4 py-3 border-r border-gray-300">{item.call_data?.call_outbound_rate}</td>
+                        </>
+                      }
+                      {/* <td className="px-4 py-3 border-r border-gray-300">{formatCurrency(item.call_data?.call_inbound_usage + item.call_data?.call_outbound_usage)}</td> */}
+
+                      {/* Totals */}
+                      <td className="px-4 py-3 font-medium text-green-600">
+                        {formatCurrency(item.combined_totals?.total_inbound_usage)}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                          {item.outboundSegment}
-                        </span>
+                      <td className="px-4 py-3 font-medium text-blue-600">
+                        {formatCurrency(item.combined_totals?.total_outbound_usage)}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {item.messageCountInbound.toLocaleString()}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {item.messageCountOutbound.toLocaleString()}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center text-sm font-medium text-green-600">
-                          {/* <DollarSign className="w-4 h-4 mr-1" /> */}
-                          {formatCurrency(item.inboundUsage)}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center text-sm font-medium text-blue-600">
-                          {/* <DollarSign className="w-4 h-4 mr-1" /> */}
-                          {formatCurrency(item.outboundUsage)}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {item?.total_usage}
+                      <td className="px-4 py-3 font-medium text-gray-800">
+                        {formatCurrency(item.combined_totals?.total_usage)}
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
+
           )}
         </div>
       </div>

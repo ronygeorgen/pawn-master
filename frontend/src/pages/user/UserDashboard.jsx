@@ -58,8 +58,8 @@ const UserDashboard = () => {
                     {viewMode === 'account' && (
                       <th rowSpan={2} className="px-6 py-3 text-left font-semibold text-gray-600">Location</th>
                     )}
-                    <th colSpan={viewMode==='account'?9:6} className="text-center font-semibold text-blue-700 border-l border-gray-300 border-r py-2 border-b">SMS Data</th>
-                    <th colSpan={viewMode==='account'? 10:8} className="text-center font-semibold text-green-700 border-r border-gray-300 border-b">Call Data</th>
+                    <th colSpan={viewMode==='account'?9:6} className="text-center font-semibold text-blue-700 border-l border-gray-300 border-r py-4 border-b">SMS Data</th>
+                    <th colSpan={viewMode==='account'? 11:8} className="text-center font-semibold text-green-700 border-r border-gray-300 border-b">Call Data</th>
                     <th colSpan={3} className="text-center font-semibold text-gray-700">Totals</th>
                   </tr>
                   <tr className="text-sm text-gray-500 font-medium">
@@ -90,7 +90,8 @@ const UserDashboard = () => {
                     {viewMode === 'account' &&
                       <>
                         <th className="px-4 py-2">Inbound Rate</th>
-                        <th className="px-4 py-2 border-r border-gray-300">Outbound Rate</th>
+                        <th className="px-4 py-2">Outbound Rate</th>
+                        <th className="px-4 py-2 border-r border-gray-300">Total Call Usage</th>
                       </>
                     }
                     {/* <th className="px-4 py-2 border-r border-gray-300">Total Call Usage</th> */}
@@ -137,7 +138,8 @@ const UserDashboard = () => {
                       {viewMode === 'account' &&
                         <>
                           <td className="px-4 py-3">{item.call_data?.call_inbound_rate}</td>
-                          <td className="px-4 py-3 border-r border-gray-300">{item.call_data?.call_outbound_rate}</td>
+                          <td className="px-4 py-3">{item.call_data?.call_outbound_rate}</td>
+                          <td className="px-4 py-3 border-r border-gray-300">{formatCurrency(item.call_data?.total_call_usage)}</td>
                         </>
                       }
                       {/* <td className="px-4 py-3 border-r border-gray-300">{formatCurrency(item.call_data?.call_inbound_usage + item.call_data?.call_outbound_usage)}</td> */}

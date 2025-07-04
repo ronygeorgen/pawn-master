@@ -308,7 +308,7 @@ const UserDashboard = () => {
                           <td className="px-4 py-3 text-center">
                             <div className="flex items-center justify-center space-x-2">
                               <span className="font-medium text-purple-600">
-                                {formatCurrency(item.wallet_balance || 0)}
+                                {formatCurrency(viewMode === 'account'? item.combined_totals?.wallet_balance : item.combined_totals?.total_wallet_balance || 0)}
                               </span>
                               <button
                                 onClick={handleWalletRefresh}

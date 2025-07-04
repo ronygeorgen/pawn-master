@@ -41,12 +41,7 @@ class CategoriesService {
   }
 
   async deleteCategory(id) {
-    try {
       return await apiService.delete(`category/categories/${id}/`);
-    } catch (error) {
-      console.error(`Error deleting category ${id}:`, error);
-      throw error;
-    }
   }
 }
 

@@ -1,12 +1,16 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Tag, Plus, Edit2, Trash2 } from 'lucide-react';
 import { useCategories } from '../../hooks/useCategories';
 import Button from '../../components/common/Button';
 import Modal from '../../components/common/Modal';
 import Shimmer from '../../components/common/Shimmer';
+import { toast } from 'react-toastify';
+import { useDispatch } from 'react-redux';
+import { clearError } from '../../store/slices/categoriesSlice';
+
 
 const CategoriesPage = () => {
-  const { categories, loading, createCategory, updateCategory, deleteCategory } = useCategories();
+  const { categories, loading, error, createCategory, updateCategory, deleteCategory } = useCategories();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
   const [formData, setFormData] = useState({
@@ -14,6 +18,8 @@ const CategoriesPage = () => {
     description: '',
     color: '#3B82F6',
   });
+
+  const dispatch = useDispatch();
 
   const colorOptions = [
     { value: '#3B82F6', label: 'Blue' },
@@ -26,6 +32,18 @@ const CategoriesPage = () => {
     { value: '#14B8A6', label: 'Teal' },
     { value: '#FF5733', label: 'Outrageous Orange' },
   ];
+
+  useEffect(()=>{
+    if (error){
+      toast.error(error);
+    }
+    dispatch(clearError())
+    console.log('working');
+    
+  }, [error])
+
+  console.log(error, 'error');
+  
 
   const handleOpenModal = (category) => {
     if (category) {

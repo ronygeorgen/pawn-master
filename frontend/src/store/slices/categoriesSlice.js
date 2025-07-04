@@ -30,9 +30,13 @@ export const updateCategory = createAsyncThunk(
 
 export const deleteCategory = createAsyncThunk(
   'categories/deleteCategory',
-  async (id) => {
-    await categoriesService.deleteCategory(id);
-    return id;
+  async (id, {rejectWithValue}) => {
+    try{
+      await categoriesService.deleteCategory(id);
+      return id;
+    }catch(error){
+      return rejectWithValue(error?.response?.data)
+    }
   }
 );
 
@@ -80,7 +84,8 @@ const categoriesSlice = createSlice({
         state.categories = state.categories.filter(cat => cat.id !== action.payload);
       })
       .addCase(deleteCategory.rejected, (state, action) => {
-        state.error = action.payload;
+        console.log(action?.payload, 'payload');
+        state.error = action.payload?.error;
       })
   },
 });

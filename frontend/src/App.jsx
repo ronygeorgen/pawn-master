@@ -12,6 +12,8 @@ import UserDashboard from './pages/user/UserDashboard';
 import LoginPage from './pages/admin/LoginPage';
 import AdminProtected from './pages/admin/AdminProtected';
 
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   return (
@@ -37,6 +39,20 @@ function App() {
             {/* Default redirect */}
             <Route path="/" element={<Navigate to="/admin\" replace />} />
           </Routes>
+          <ToastContainer 
+            position="top-right"
+            autoClose={3000}
+            hideProgressBar
+            closeOnClick
+            pauseOnHover
+            draggable
+            theme="light"
+            toastClassName={() =>
+              "bg-white border border-gray-200 rounded-md shadow-sm px-4 py-3 text-sm text-gray-800 flex items-center space-x-2"
+            }
+            bodyClassName="m-0 p-0"
+            closeButton={false}
+          />
         </div>
       </Router>
     </Provider>

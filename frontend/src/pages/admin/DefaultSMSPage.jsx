@@ -277,7 +277,7 @@ const DefaultSMSPage = () => {
                 </div>
 
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Incoming Call</span>
+                  <span className="text-sm text-gray-600">Outgoing Call</span>
                   <span className="text-lg font-semibold text-green-600">
                     ${formData?.default_call_outbound_rate} {formData?.currency}
                   </span>

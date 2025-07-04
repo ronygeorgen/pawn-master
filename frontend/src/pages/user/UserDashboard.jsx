@@ -46,43 +46,61 @@ const UserDashboard = () => {
     console.log('Refreshing wallet data...');
   };
 
+  const formatMinutesToHours=(totalMinutes)=> {
+    if (!totalMinutes || isNaN(totalMinutes)) return "0 hrs 0 mins";
+
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = Math.round(totalMinutes % 60);
+
+    return `${hours} hr${hours !== 1 ? 's' : ''} ${minutes} min${minutes !== 1 ? 's' : ''}`;
+  }
+
+
   const renderSMSDetails = (item) => (
     <div className="bg-blue-50 p-4 rounded-lg">
       <h4 className="font-medium text-blue-900 mb-3">SMS Data Details</h4>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+      <div className="flex justify-between text-sm">
         <div className='flex flex-col gap-2'>
-          <span className="text-gray-600">Inbound Segments:</span>
-          <div className="font-medium">{item.sms_data?.total_inbound_segments || 0}</div>
+          <div>
+            <span className="text-gray-600">Inbound Segments:</span>
+            <div className="font-medium">{item.sms_data?.total_inbound_segments || 0}</div>
+          </div>
+          <div>
+            <span className="text-gray-600">Outbound Segments:</span>
+            <div className="font-medium">{item.sms_data?.total_outbound_segments || 0}</div>
+          </div>
         </div>
         <div className='flex flex-col gap-2'>
-          <span className="text-gray-600">Outbound Segments:</span>
-          <div className="font-medium">{item.sms_data?.total_outbound_segments || 0}</div>
+          <div>
+            <span className="text-gray-600">Messages In:</span>
+            <div className="font-medium">{item.sms_data?.total_inbound_messages || 0}</div>
+          </div>
+          <div>
+            <span className="text-gray-600">Messages Out:</span>
+            <div className="font-medium">{item.sms_data?.total_outbound_messages || 0}</div>
+          </div>
         </div>
         <div className='flex flex-col gap-2'>
-          <span className="text-gray-600">Messages In:</span>
-          <div className="font-medium">{item.sms_data?.total_inbound_messages || 0}</div>
-        </div>
-        <div className='flex flex-col gap-2'>
-          <span className="text-gray-600">Messages Out:</span>
-          <div className="font-medium">{item.sms_data?.total_outbound_messages || 0}</div>
-        </div>
-        <div className='flex flex-col gap-2'>
-          <span className="text-gray-600">Inbound Usage:</span>
-          <div className="font-medium">{formatCurrency(item.sms_data?.sms_inbound_usage || 0)}</div>
-        </div>
-        <div className='flex flex-col gap-2'>
-          <span className="text-gray-600">Outbound Usage:</span>
-          <div className="font-medium">{formatCurrency(item.sms_data?.sms_outbound_usage || 0)}</div>
+          <div>
+            <span className="text-gray-600">Inbound Usage:</span>
+            <div className="font-medium">{formatCurrency(item.sms_data?.sms_inbound_usage || 0)}</div>
+          </div>
+          <div>
+            <span className="text-gray-600">Outbound Usage:</span>
+            <div className="font-medium">{formatCurrency(item.sms_data?.sms_outbound_usage || 0)}</div>
+          </div>
         </div>
         {viewMode === 'account' && (
           <>
             <div className='flex flex-col gap-2'>
-              <span className="text-gray-600">Inbound Rate:</span>
-              <div className="font-medium">{formatCurrency(item.sms_data?.sms_inbound_rate || 0)}</div>
-            </div>
-            <div className='flex flex-col gap-2'>
-              <span className="text-gray-600">Outbound Rate:</span>
-              <div className="font-medium">{formatCurrency(item.sms_data?.sms_outbound_rate || 0)}</div>
+              <div>
+                <span className="text-gray-600">Inbound Rate:</span>
+                <div className="font-medium">{formatCurrency(item.sms_data?.sms_inbound_rate || 0)}</div>
+              </div>
+              <div>
+                <span className="text-gray-600">Outbound Rate:</span>
+                <div className="font-medium">{formatCurrency(item.sms_data?.sms_outbound_rate || 0)}</div>
+              </div>
             </div>
           </>
         )}
@@ -93,40 +111,48 @@ const UserDashboard = () => {
   const renderCallDetails = (item) => (
     <div className="bg-green-50 p-4 rounded-lg">
       <h4 className="font-medium text-green-900 mb-3">Call Data Details</h4>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-        <div>
-          <span className="text-gray-600">Inbound Calls:</span>
-          <div className="font-medium">{item.call_data?.total_inbound_calls || 0}</div>
+      <div className="flex justify-between text-sm">
+        <div className='flex flex-col gap-2'>
+          <div>
+            <span className="text-gray-600">Inbound Calls:</span>
+            <div className="font-medium">{item.call_data?.total_inbound_calls || 0}</div>
+          </div>
+          <div>
+            <span className="text-gray-600">Outbound Calls:</span>
+            <div className="font-medium">{item.call_data?.total_outbound_calls || 0}</div>
+          </div>
         </div>
-        <div>
-          <span className="text-gray-600">Outbound Calls:</span>
-          <div className="font-medium">{item.call_data?.total_outbound_calls || 0}</div>
+        <div className='flex flex-col gap-2'>
+          <div>
+            <span className="text-gray-600">Inbound Duration:</span>
+            <div className="font-medium">{formatMinutesToHours(item.call_data?.total_inbound_call_minutes || 0)}</div>
+          </div>
+          <div>
+            <span className="text-gray-600">Outbound Duration:</span>
+            <div className="font-medium">{formatMinutesToHours(item.call_data?.total_outbound_call_minutes || 0)}</div>
+          </div>
         </div>
-        <div>
-          <span className="text-gray-600">Inbound Minutes:</span>
-          <div className="font-medium">{item.call_data?.total_inbound_call_minutes || 0}</div>
-        </div>
-        <div>
-          <span className="text-gray-600">Outbound Minutes:</span>
-          <div className="font-medium">{item.call_data?.total_outbound_call_minutes || 0}</div>
-        </div>
-        <div>
-          <span className="text-gray-600">Inbound Usage:</span>
-          <div className="font-medium">{formatCurrency(item.call_data?.call_inbound_usage || 0)}</div>
-        </div>
-        <div>
-          <span className="text-gray-600">Outbound Usage:</span>
-          <div className="font-medium">{formatCurrency(item.call_data?.call_outbound_usage || 0)}</div>
+        <div className='flex flex-col gap-2'>
+          <div>
+            <span className="text-gray-600">Inbound Usage:</span>
+            <div className="font-medium">{formatCurrency(item.call_data?.call_inbound_usage || 0)}</div>
+          </div>
+          <div>
+            <span className="text-gray-600">Outbound Usage:</span>
+            <div className="font-medium">{formatCurrency(item.call_data?.call_outbound_usage || 0)}</div>
+          </div>
         </div>
         {viewMode === 'account' && (
           <>
-            <div>
-              <span className="text-gray-600">Inbound Rate:</span>
-              <div className="font-medium">{formatCurrency(item.call_data?.call_inbound_rate || 0)}</div>
-            </div>
-            <div>
-              <span className="text-gray-600">Outbound Rate:</span>
-              <div className="font-medium">{formatCurrency(item.call_data?.call_outbound_rate || 0)}</div>
+            <div className='flex flex-col gap-2'>
+              <div>
+                <span className="text-gray-600">Inbound Rate:</span>
+                <div className="font-medium">{formatCurrency(item.call_data?.call_inbound_rate || 0)}</div>
+              </div>
+              <div>
+                <span className="text-gray-600">Outbound Rate:</span>
+                <div className="font-medium">{formatCurrency(item.call_data?.call_outbound_rate || 0)}</div>
+              </div>
             </div>
           </>
         )}
@@ -174,6 +200,9 @@ const UserDashboard = () => {
                   <thead className="bg-gray-50">
                     <tr>
                       <th className="px-6 py-3 text-left font-semibold text-gray-600">Company</th>
+                      {viewMode === 'company' && (
+                        <th className="px-6 py-3 text-left font-semibold text-gray-600">Location count</th>
+                      )}
                       {viewMode === 'account' && (
                         <th className="px-6 py-3 text-left font-semibold text-gray-600">Location</th>
                       )}
@@ -209,6 +238,9 @@ const UserDashboard = () => {
                       <React.Fragment key={idx}>
                         <tr className="hover:bg-gray-50 transition">
                           <td className="px-6 py-3 font-medium text-gray-900">{item?.company_name || 'Nil'}</td>
+                          {viewMode === 'company' && (
+                            <td className="px-6 py-3 text-gray-700">{item?.combined_totals?.locations_count}</td>
+                          )}
                           {viewMode === 'account' && (
                             <td className="px-6 py-3 text-gray-700">{item?.location_name}</td>
                           )}

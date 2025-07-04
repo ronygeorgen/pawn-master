@@ -17,7 +17,7 @@ const AdminLayout = () => {
   const settingsOptions = [
     { label: 'SMS Groups', path: '/admin/settings/sms-groups', icon: Users },
     { label: 'Categories', path: '/admin/settings/categories', icon: Tag },
-    { label: 'Default SMS', path: '/admin/settings/default-sms', icon: MessageSquare },
+    { label: 'Default SMS and Call', path: '/admin/settings/default-sms', icon: MessageSquare },
     { label: 'Onboarding', path: '/admin/onboarding', icon: Shield },
   ];
 

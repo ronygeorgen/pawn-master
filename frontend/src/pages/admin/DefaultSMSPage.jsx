@@ -125,7 +125,7 @@ const DefaultSMSPage = () => {
         <div className="px-6 py-4 border-b border-gray-200">
           <h3 className="text-lg font-medium text-gray-900 flex items-center">
             <MessageSquare className="w-5 h-5 mr-2 text-blue-600" />
-            Default SMS Rates
+            Default SMS and Call Rates
           </h3>
           <p className="text-sm text-gray-600 mt-1">
             Configure your default pricing for SMS messages
@@ -180,28 +180,6 @@ const DefaultSMSPage = () => {
               </div>
 
               <div>
-                <label htmlFor="default_call_outbound_rate" className="block text-sm font-medium text-gray-700 mb-2">
-                  Call Outbound Rate
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <DollarSign className="h-5 w-5 text-gray-400" />
-                  </div>
-                  <input
-                    type="number"
-                    step="any"
-                    min="0"
-                    id="default_call_outbound_rate"
-                    value={formData?.default_call_outbound_rate}
-                    onChange={(e) => handleInputChange('default_call_outbound_rate', parseFloat(e.target.value) || 0)}
-                    className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                    placeholder="0.05"
-                  />
-                </div>
-                <p className="text-xs text-gray-500 mt-1">Cost per outgoing message</p>
-              </div>
-
-              <div>
                 <label htmlFor="default_call_inbound_rate" className="block text-sm font-medium text-gray-700 mb-2">
                   Call Inbound Rate
                 </label>
@@ -222,8 +200,30 @@ const DefaultSMSPage = () => {
                 </div>
                 <p className="text-xs text-gray-500 mt-1">Cost per outgoing message</p>
               </div>
-              
+
               <div>
+                <label htmlFor="default_call_outbound_rate" className="block text-sm font-medium text-gray-700 mb-2">
+                  Call Outbound Rate
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <DollarSign className="h-5 w-5 text-gray-400" />
+                  </div>
+                  <input
+                    type="number"
+                    step="any"
+                    min="0"
+                    id="default_call_outbound_rate"
+                    value={formData?.default_call_outbound_rate}
+                    onChange={(e) => handleInputChange('default_call_outbound_rate', parseFloat(e.target.value) || 0)}
+                    className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    placeholder="0.05"
+                  />
+                </div>
+                <p className="text-xs text-gray-500 mt-1">Cost per outgoing message</p>
+              </div>
+              
+              {/* <div>
                 <label htmlFor="currency" className="block text-sm font-medium text-gray-700 mb-2">
                   Currency
                 </label>
@@ -237,7 +237,7 @@ const DefaultSMSPage = () => {
                   <option value="EUR">EUR - Euro</option>
                   <option value="GBP">GBP - British Pound</option>
                 </select>
-              </div>
+              </div> */}
               
               <div className="flex flex-col sm:flex-row gap-3 w-full">
                 <Button
@@ -258,14 +258,28 @@ const DefaultSMSPage = () => {
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-600">Incoming SMS</span>
                   <span className="text-lg font-semibold text-green-600">
-                    ${formData?.incomingRate?.toFixed(3)} {formData?.currency}
+                    ${formData?.default_inbound_rate} {formData?.currency}
                   </span>
                 </div>
                 
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-600">Outgoing SMS</span>
                   <span className="text-lg font-semibold text-blue-600">
-                    ${formData?.outgoingRate?.toFixed(3)} {formData?.currency}
+                    ${formData?.default_outbound_rate} {formData?.currency}
+                  </span>
+                </div>
+
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-600">Incoming Call</span>
+                  <span className="text-lg font-semibold text-green-600">
+                    ${formData?.default_call_inbound_rate} {formData?.currency}
+                  </span>
+                </div>
+
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-600">Incoming Call</span>
+                  <span className="text-lg font-semibold text-green-600">
+                    ${formData?.default_call_outbound_rate} {formData?.currency}
                   </span>
                 </div>
                 

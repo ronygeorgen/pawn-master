@@ -367,6 +367,57 @@ const CallSMSBarChart = ({viewMode}) => {
         </div>
       </div>
 
+      {/* Summary Statistics */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="bg-white shadow rounded-lg">
+          <div className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Total Records</p>
+                <p className="text-2xl font-bold text-gray-900">{data?.data?.length || 0}</p>
+              </div>
+              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                <Calendar className="w-6 h-6 text-blue-600" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* <div className="bg-white shadow rounded-lg">
+          <div className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Locations</p>
+                <p className="text-2xl font-bold text-gray-900">{data?.location_ids?.length || 0}</p>
+              </div>
+              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                <Filter className="w-6 h-6 text-green-600" />
+              </div>
+            </div>
+          </div>
+        </div> */}
+
+        <div className="bg-white shadow rounded-lg">
+          <div className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Data Type</p>
+                <p className="text-2xl font-bold text-gray-900 capitalize">{data?.data_type}</p>
+              </div>
+              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                {appliedFilters.data_type === "call" ? (
+                  <Phone className="w-6 h-6 text-purple-600" />
+                ) : appliedFilters.data_type === "sms" ? (
+                  <MessageSquare className="w-6 h-6 text-purple-600" />
+                ) : (
+                  <Filter className="w-6 h-6 text-purple-600" />
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Chart */}
       <div className="bg-white shadow rounded-lg">
         <div className="px-6 py-4 border-b border-gray-200">
@@ -421,56 +472,7 @@ const CallSMSBarChart = ({viewMode}) => {
         </div>
       </div>
 
-      {/* Summary Statistics */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white shadow rounded-lg">
-          <div className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Total Records</p>
-                <p className="text-2xl font-bold text-gray-900">{data?.data?.length || 0}</p>
-              </div>
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                <Calendar className="w-6 h-6 text-blue-600" />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white shadow rounded-lg">
-          <div className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Locations</p>
-                <p className="text-2xl font-bold text-gray-900">{data?.location_ids?.length || 0}</p>
-              </div>
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                <Filter className="w-6 h-6 text-green-600" />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white shadow rounded-lg">
-          <div className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Data Type</p>
-                <p className="text-2xl font-bold text-gray-900 capitalize">{data?.data_type}</p>
-              </div>
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                {appliedFilters.data_type === "call" ? (
-                  <Phone className="w-6 h-6 text-purple-600" />
-                ) : appliedFilters.data_type === "sms" ? (
-                  <MessageSquare className="w-6 h-6 text-purple-600" />
-                ) : (
-                  <Filter className="w-6 h-6 text-purple-600" />
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      
     </div>
   )
 }

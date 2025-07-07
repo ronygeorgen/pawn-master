@@ -14,6 +14,7 @@ import {
 import { clearError, fetchUserData, refreshCall, refreshWallet } from '../../store/slices/userDataSlice';
 import LoadingTable from '../../components/common/LoadingTable';
 import { toast } from 'react-toastify';
+import CallSMSBarChart from '../../components/CallSMSBarChart ';
 
 
 const UserDashboard = () => {
@@ -218,6 +219,7 @@ const UserDashboard = () => {
 
   return (
     <div className="space-y-6">
+      <CallSMSBarChart viewMode={viewMode}/>
       {/* Data Table Section */}
       <div className="bg-white shadow rounded-lg">
         <div className="px-6 py-4 border-b border-gray-200">

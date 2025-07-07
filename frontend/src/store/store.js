@@ -6,6 +6,7 @@ import smsGroupsReducer from './slices/smsGroupsSlice';
 import defaultSMSReducer from './slices/defaultSMSSlice';
 import userDataReducer from './slices/userDataSlice';
 import adminReducer from './slices/adminSlice';
+import callsmschartReducer from './slices/callsmschartslice'
 
 export const store = configureStore({
   reducer: {
@@ -15,6 +16,7 @@ export const store = configureStore({
     smsGroups: smsGroupsReducer,
     defaultSMS: defaultSMSReducer,
     userData: userDataReducer,
-    admin: adminReducer
+    admin: adminReducer,
+    callsms: callsmschartReducer,
   },
 });

@@ -63,7 +63,7 @@ class UserDataService {
   async refreshCallService(query_name, id) {
     console.log(query_name, 'query', id);
     
-    const response = await apiService.get(`/accounts/sync-calls/?${query_name}=${id}`);
+    const response = await apiService.get(`/accounts/analytics/bar-graph-analytics/`);
     console.log(response, 'responseee');
     
     return response

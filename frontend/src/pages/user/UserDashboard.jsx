@@ -11,17 +11,33 @@ import {
   Phone,
   Eye
 } from 'lucide-react';
-import { fetchUserData } from '../../store/slices/userDataSlice';
+import { clearError, fetchUserData, refreshWallet } from '../../store/slices/userDataSlice';
 import LoadingTable from '../../components/common/LoadingTable';
+import { toast } from 'react-toastify';
+
 
 const UserDashboard = () => {
   const dispatch = useDispatch();
-  const { data, filters, viewMode, loading, error } = useSelector(
+  const { data, filters, viewMode, loading, error, success } = useSelector(
     state => state.userData
   );
   
   const [expandedRows, setExpandedRows] = useState({});
   const [expandedType, setExpandedType] = useState({});
+  const [refreshingWallet, setRefreshingWallet] = useState(null);
+
+  useEffect(()=>{
+    if (success){
+      toast.success('Wallet refreshed!', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        pauseOnHover: true,
+        draggable: true,
+      });
+    }
+    dispatch(clearError())
+  }, [success])
 
   useEffect(() => {
     dispatch(fetchUserData({ filters, viewMode }));
@@ -41,9 +57,15 @@ const UserDashboard = () => {
     }));
   };
 
-  const handleWalletRefresh = () => {
-    // Add wallet refresh logic here
-    console.log('Refreshing wallet data...');
+  const handleWalletRefresh = async (locationId) => {
+    setRefreshingWallet(locationId);
+    try {
+      await dispatch(refreshWallet(locationId)).unwrap();
+    } catch (error) {
+      console.error('Error refreshing wallet:', error);
+    } finally {
+      setRefreshingWallet(null);
+    }
   };
 
   const formatMinutesToHours=(totalMinutes)=> {
@@ -311,10 +333,12 @@ const UserDashboard = () => {
                                 {formatCurrency(viewMode === 'account'? item.combined_totals?.wallet_balance : item.combined_totals?.total_wallet_balance || 0)}
                               </span>
                               <button
-                                onClick={handleWalletRefresh}
+                                onClick={()=>{handleWalletRefresh(item?.location_id)}}
                                 className="p-1 hover:bg-purple-100 rounded-full transition-colors"
                               >
-                                <RefreshCw className="w-4 h-4 text-purple-600" />
+                                {viewMode==='account'&&<RefreshCw className={`w-4 h-4 text-purple-600 ${
+                                  refreshingWallet === item.location_id ? 'animate-spin' : ''
+                                }`} />}
                               </button>
                             </div>
                           </td>

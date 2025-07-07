@@ -11,6 +11,7 @@ const initialState = {
   viewMode: 'company',
   loading: false,
   error: null,
+  success: false
 };
 
 export const fetchUserData = createAsyncThunk(
@@ -19,6 +20,19 @@ export const fetchUserData = createAsyncThunk(
     console.log(filters, viewMode, 'from slice acrtion');
     
     return await userDataService.getUserData(filters, viewMode);
+  }
+);
+
+export const refreshWallet = createAsyncThunk(
+  'userData/refreshWallet',
+  async (location_id, {rejectWithValue}) => {
+    console.log(location_id, 'from slice acrtion');
+    try{
+      return await userDataService.refreshWalletService(location_id);
+    }
+    catch(error){
+      return rejectWithValue(error)
+    }
   }
 );
 
@@ -34,6 +48,8 @@ const userDataSlice = createSlice({
     },
     clearError: (state) => {
       state.error = null;
+      state.success = false;
+      state.loading = false;
     },
   },
   extraReducers: (builder) => {
@@ -49,7 +65,24 @@ const userDataSlice = createSlice({
       .addCase(fetchUserData.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || 'Failed to fetch user data';
-      });
+      })
+
+      .addCase(refreshWallet.fulfilled, (state, action) => {
+        const locationId = action.meta.arg;
+        state.loading = false;
+        console.log(action?.payload, 'payload', locationId);
+        
+        state.data = state.data.map((item) => {
+          if (item?.location_id === locationId) {
+            return {
+              ...item,
+              current_balance: action?.payload?.details?.current_balance,
+            };
+          }
+          return item;
+        });
+        state.success = true;
+      })
   },
 });
 

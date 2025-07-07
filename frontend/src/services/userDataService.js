@@ -52,6 +52,13 @@ class UserDataService {
       throw error;
     }
   }
+
+  async refreshWalletService(location_id) {
+    console.log(location_id, 'location_id');
+    
+    const response = location_id ? await apiService.get(`/accounts/sync-wallets/?location_id=${location_id}`) : await apiService.get(`/accounts/sync-wallets/`);
+    return response
+  }
 }
 
 export const userDataService = new UserDataService();

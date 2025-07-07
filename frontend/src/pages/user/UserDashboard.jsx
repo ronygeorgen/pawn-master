@@ -11,20 +11,21 @@ import {
   Phone,
   Eye
 } from 'lucide-react';
-import { clearError, fetchUserData, refreshWallet } from '../../store/slices/userDataSlice';
+import { clearError, fetchUserData, refreshCall, refreshWallet } from '../../store/slices/userDataSlice';
 import LoadingTable from '../../components/common/LoadingTable';
 import { toast } from 'react-toastify';
 
 
 const UserDashboard = () => {
   const dispatch = useDispatch();
-  const { data, filters, viewMode, loading, error, success } = useSelector(
+  const { data, filters, viewMode, loading, error, success, refreshCallSuccess } = useSelector(
     state => state.userData
   );
   
   const [expandedRows, setExpandedRows] = useState({});
   const [expandedType, setExpandedType] = useState({});
   const [refreshingWallet, setRefreshingWallet] = useState(null);
+  const [refreshingCall, setRefreshingCall] = useState(null);
 
   useEffect(()=>{
     if (success){
@@ -35,9 +36,17 @@ const UserDashboard = () => {
         pauseOnHover: true,
         draggable: true,
       });
+    }else if(refreshCallSuccess){
+      toast.success('Call refreshed!', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        pauseOnHover: true,
+        draggable: true,
+      });
     }
     dispatch(clearError())
-  }, [success])
+  }, [success, refreshCallSuccess])
 
   useEffect(() => {
     dispatch(fetchUserData({ filters, viewMode }));
@@ -67,6 +76,18 @@ const UserDashboard = () => {
       setRefreshingWallet(null);
     }
   };
+
+  const handleCallRefresh = async (query_name, id) => {
+    setRefreshingCall({query_name, id});
+    try {
+      await dispatch(refreshCall({query_name, id})).unwrap();
+    } catch (error) {
+      console.error('Error refreshing call:', error);
+    } finally {
+      setRefreshingCall(null);
+    }
+  };
+  
 
   const formatMinutesToHours=(totalMinutes)=> {
     if (!totalMinutes || isNaN(totalMinutes)) return "0 hrs 0 mins";
@@ -192,6 +213,9 @@ const UserDashboard = () => {
     </div>
   );
 
+  console.log(refreshingCall, 'call');
+  
+
   return (
     <div className="space-y-6">
       {/* Data Table Section */}
@@ -288,21 +312,38 @@ const UserDashboard = () => {
                           </td>
 
                           {/* Call Usage with expand button */}
-                          <td className="px-4 py-3 text-center">
-                            <div className="flex items-center justify-center space-x-2">
-                              <span className="font-medium text-green-600">
-                                {formatCurrency(item.call_data?.total_call_usage || 
-                                  (item.call_data?.call_inbound_usage + item.call_data?.call_outbound_usage))}
-                              </span>
+                          <td className="px-4 py-3 text-center align-middle">
+                            <div className="flex items-center justify-center gap-2 h-6">
+                              <div className="text-green-600 font-medium leading-none min-w-[60px] text-right">
+                                {formatCurrency(
+                                  item.call_data?.total_call_usage ??
+                                  (item.call_data?.call_inbound_usage + item.call_data?.call_outbound_usage)
+                                )}
+                              </div>
                               <button
                                 onClick={() => toggleRowExpansion(idx, 'call')}
-                                className="p-1 hover:bg-green-100 rounded-full transition-colors"
+                                className="w-6 h-6 flex items-center justify-center p-1 rounded-full hover:bg-green-100 transition-colors"
                               >
                                 {expandedRows[idx] === 'call' ? (
                                   <ChevronDown className="w-4 h-4 text-green-600" />
                                 ) : (
                                   <ChevronRight className="w-4 h-4 text-green-600" />
                                 )}
+                              </button>
+                              <button
+                                onClick={() =>
+                                  viewMode === 'company'
+                                    ? handleCallRefresh('company_id', item?.company_id)
+                                    : handleCallRefresh('location_id', item?.location_id)
+                                }
+                                className="w-6 h-6 flex items-center justify-center p-1 rounded-full hover:bg-purple-100 transition-colors"
+                              >
+                                <RefreshCw className={`w-4 h-4 text-purple-600 ${
+                                  refreshingCall &&
+                                  item[refreshingCall.query_name] === refreshingCall.id
+                                    ? 'animate-spin'
+                                    : ''
+                                }`} />
                               </button>
                             </div>
                           </td>
@@ -327,19 +368,27 @@ const UserDashboard = () => {
                           </td>
 
                           {/* Wallet with refresh button */}
-                          <td className="px-4 py-3 text-center">
-                            <div className="flex items-center justify-center space-x-2">
-                              <span className="font-medium text-purple-600">
-                                {formatCurrency(viewMode === 'account'? item.combined_totals?.wallet_balance : item.combined_totals?.total_wallet_balance || 0)}
-                              </span>
-                              <button
-                                onClick={()=>{handleWalletRefresh(item?.location_id)}}
-                                className="p-1 hover:bg-purple-100 rounded-full transition-colors"
-                              >
-                                {viewMode==='account'&&<RefreshCw className={`w-4 h-4 text-purple-600 ${
-                                  refreshingWallet === item.location_id ? 'animate-spin' : ''
-                                }`} />}
-                              </button>
+                          <td className="px-4 py-3 text-center align-middle">
+                            <div className="flex items-center justify-center gap-2 h-6">
+                              <div className="text-purple-600 font-medium leading-none min-w-[60px] text-right">
+                                {formatCurrency(
+                                  viewMode === 'account'
+                                    ? item.combined_totals?.wallet_balance
+                                    : item.combined_totals?.total_wallet_balance || 0
+                                )}
+                              </div>
+                              {viewMode === 'account' && (
+                                <button
+                                  onClick={() => handleWalletRefresh(item?.location_id)}
+                                  className="w-6 h-6 flex items-center justify-center p-1 rounded-full hover:bg-purple-100 transition-colors"
+                                >
+                                  <RefreshCw
+                                    className={`w-4 h-4 text-purple-600 ${
+                                      refreshingWallet === item.location_id ? 'animate-spin' : ''
+                                    }`}
+                                  />
+                                </button>
+                              )}
                             </div>
                           </td>
                         </tr>

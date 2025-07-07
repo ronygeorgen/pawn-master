@@ -59,6 +59,15 @@ class UserDataService {
     const response = location_id ? await apiService.get(`/accounts/sync-wallets/?location_id=${location_id}`) : await apiService.get(`/accounts/sync-wallets/`);
     return response
   }
+
+  async refreshCallService(query_name, id) {
+    console.log(query_name, 'query', id);
+    
+    const response = await apiService.get(`/accounts/sync-calls/?${query_name}=${id}`);
+    console.log(response, 'responseee');
+    
+    return response
+  }
 }
 
 export const userDataService = new UserDataService();

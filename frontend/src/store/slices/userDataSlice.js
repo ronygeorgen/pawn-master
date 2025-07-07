@@ -10,6 +10,7 @@ const initialState = {
   },
   viewMode: 'company',
   loading: false,
+  refreshCallSuccess:false,
   error: null,
   success: false
 };
@@ -36,6 +37,19 @@ export const refreshWallet = createAsyncThunk(
   }
 );
 
+export const refreshCall = createAsyncThunk(
+  'userData/refreshCall',
+  async ({query_name, id}, {rejectWithValue}) => {
+    try{
+      return await userDataService.refreshCallService(query_name, id);
+    }
+    catch(error){
+      return rejectWithValue(error)
+    }
+  }
+);
+
+
 const userDataSlice = createSlice({
   name: 'userData',
   initialState,
@@ -50,6 +64,7 @@ const userDataSlice = createSlice({
       state.error = null;
       state.success = false;
       state.loading = false;
+      state.refreshCallSuccess=false;
     },
   },
   extraReducers: (builder) => {
@@ -82,6 +97,10 @@ const userDataSlice = createSlice({
           return item;
         });
         state.success = true;
+      })
+
+      .addCase(refreshCall.fulfilled, (state)=>{
+        state.refreshCallSuccess = true;
       })
   },
 });

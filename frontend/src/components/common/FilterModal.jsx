@@ -89,15 +89,29 @@ const FilterModal = ({ isOpen, onClose, filters, onApplyFilters, onResetFilters,
   useEffect(() => {
     // fetchCompanySuggestions("")
     fetchCategorySuggestions("")
+    fetchCompanySuggestions("")
   },[])
 
   const fetchCompanySuggestions = async (term) => {
-    // if (!term || term.length < 2) return;
-    
     setCompanyLoading(true);
     try {
       const res = await apiService.get(`/accounts/ghl-auth/?search=${term}`);
-      setCompanySuggestions(res.results || []);
+      const allLocations = res.results || [];
+  
+      // Deduplicate by company_id
+      const uniqueCompaniesMap = new Map();
+  
+      for (const location of allLocations) {
+        // This will override previous entries and keep the latest one for each company_id
+        if (location.company_id) {
+          uniqueCompaniesMap.set(location.company_id, location);
+        }
+      }
+  
+      // Convert back to array
+      const uniqueCompanySuggestions = Array.from(uniqueCompaniesMap.values());
+  
+      setCompanySuggestions(uniqueCompanySuggestions);
     } catch (err) {
       console.error('Failed to fetch company suggestions', err);
       setCompanySuggestions([]);

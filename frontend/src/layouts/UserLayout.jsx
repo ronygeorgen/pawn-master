@@ -25,10 +25,10 @@ const UserLayout = () => {
   const handleApplyFilters = (newFilters) => {
     console.log('Applying filters:', newFilters, 'with viewMode:', viewMode);
     dispatch(setFilters(newFilters));
-    dispatch(setcallsmsFilters({date_range:newFilters.dateRange}))
+    dispatch(setcallsmsFilters({date_range:newFilters.dateRange, view_type:viewMode}))
     // Pass filters and viewMode directly to avoid race conditions
     dispatch(fetchUserData({ filters: newFilters, viewMode }));
-    dispatch(fetchData({...localFilters, date_range:newFilters.dateRange}))
+    dispatch(fetchData({...localFilters, date_range:newFilters.dateRange, view_type:viewMode}))
   };
 
   const handleResetFilters = () => {

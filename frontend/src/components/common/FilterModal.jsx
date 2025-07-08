@@ -6,7 +6,7 @@ import { apiService } from '../../services/api';
 const getDefaultDateRange = () => {
     const today = new Date();
     const pastDate = new Date();
-    pastDate.setFullYear(today.getFullYear() - 5);
+    pastDate.setFullYear(today.getFullYear() - 1);
 
     const format = (date) => date.toISOString().split("T")[0];
 

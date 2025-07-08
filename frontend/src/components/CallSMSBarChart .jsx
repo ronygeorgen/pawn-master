@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from "react"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts"
-import { Calendar, Phone, MessageSquare, Filter, RefreshCw, AlertTriangle, TrendingUp, Users, Clock } from "lucide-react"
+import { Calendar, Phone, MessageSquare, Filter, RefreshCw, AlertTriangle, TrendingUp, Users, Clock, ChevronDown } from "lucide-react"
 import { useDispatch, useSelector } from "react-redux"
 import { fetchCompanyAccounts, fetchData, resetCompanyAccounts, setFilters } from "../store/slices/callsmschartslice"
 
@@ -11,6 +11,7 @@ const CallSMSBarChart = ({ viewMode }) => {
   
   const dispatch = useDispatch()
   const { data, filters, loading, error, companyAccounts } = useSelector((state) => state.callsms)
+  const [showFilters, setShowFilters] = useState(false)
 
   const today = new Date()
   const threeYearsAgo = new Date()
@@ -26,7 +27,7 @@ const CallSMSBarChart = ({ viewMode }) => {
     company_ids: filters?.company_ids || [],
     location_ids: filters?.location_ids || [],
     graph_type: filters?.graph_type || "monthly",
-    data_type: filters?.data_type || "call",
+    data_type: filters?.data_type || "both",
   })
 
   const [appliedFilters, setAppliedFilters] = useState(localFilters)
@@ -101,8 +102,8 @@ const CallSMSBarChart = ({ viewMode }) => {
   }, [data?.data, appliedFilters.data_type, appliedFilters.graph_type])
 
   const colors = {
-    total_calls: "#3b82f6",
-    total_sms: "#ef4444",
+    total_calls: "#10b981",
+    total_sms: "#3b82f6",
   }
 
   const CustomTooltip = ({ active, payload, label }) => {
@@ -111,17 +112,17 @@ const CallSMSBarChart = ({ viewMode }) => {
     const data = payload[0]?.payload;
 
     return (
-      <div className="bg-white border border-gray-200 rounded-xl shadow-lg p-4 min-w-[300px]">
+      <div className="bg-white border border-gray-200 rounded-lg shadow-lg p-4 min-w-[280px]">
         <div className="font-semibold text-gray-900 mb-3 pb-2 border-b border-gray-100">
           {label}
         </div>
 
         <div className="space-y-3">
           {(appliedFilters.data_type === 'call' || appliedFilters.data_type === 'both') && (
-            <div className="bg-blue-50 rounded-lg p-3">
+            <div className="bg-green-50 rounded-lg p-3">
               <div className="flex items-center gap-2 mb-2">
-                <Phone className="w-4 h-4 text-blue-600" />
-                <span className="font-medium text-blue-900">Call Data</span>
+                <Phone className="w-4 h-4 text-green-600" />
+                <span className="font-medium text-green-900">Call Data</span>
               </div>
               <div className="grid grid-cols-2 gap-2 text-sm">
                 <div className="text-gray-600">Total: <span className="font-medium text-gray-900">{data.total_calls ?? 0}</span></div>
@@ -133,10 +134,10 @@ const CallSMSBarChart = ({ viewMode }) => {
           )}
 
           {(appliedFilters.data_type === 'sms' || appliedFilters.data_type === 'both') && (
-            <div className="bg-red-50 rounded-lg p-3">
+            <div className="bg-blue-50 rounded-lg p-3">
               <div className="flex items-center gap-2 mb-2">
-                <MessageSquare className="w-4 h-4 text-red-600" />
-                <span className="font-medium text-red-900">SMS Data</span>
+                <MessageSquare className="w-4 h-4 text-blue-600" />
+                <span className="font-medium text-blue-900">SMS Data</span>
               </div>
               <div className="grid grid-cols-2 gap-2 text-sm">
                 <div className="text-gray-600">Total: <span className="font-medium text-gray-900">{data.total_sms ?? 0}</span></div>
@@ -190,9 +191,9 @@ const CallSMSBarChart = ({ viewMode }) => {
 
   if (error) {
     return (
-      <div className="min-h-[400px] bg-gray-50 rounded-xl p-8">
+      <div className="bg-white shadow rounded-lg p-6">
         <div className="max-w-md mx-auto">
-          <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
             <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <AlertTriangle className="w-6 h-6 text-red-600" />
             </div>
@@ -211,72 +212,66 @@ const CallSMSBarChart = ({ viewMode }) => {
   }
 
   return (
-    <div className="space-y-8 bg-gray-50 min-h-screen p-6">
-      <div className="max-w-7xl mx-auto">
-        {/* Header Section */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 mb-8">
-          <div className="px-8 py-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
-                  {data?.data_type === "call" ? (
-                    <Phone className="w-6 h-6 text-white" />
-                  ) : data?.data_type === "sms" ? (
-                    <MessageSquare className="w-6 h-6 text-white" />
-                  ) : (
-                    <TrendingUp className="w-6 h-6 text-white" />
-                  )}
-                </div>
-                <div>
-                  <h1 className="text-2xl font-bold text-gray-900">
-                    {data?.data_type === "both" ? "Call & SMS Analytics" : `${data?.data_type?.toUpperCase()} Analytics`}
-                  </h1>
-                  <p className="text-gray-600 mt-1">
-                    {data?.date_range?.start && data?.date_range?.end ? (
-                      <>
-                        Showing data from {new Date(data.date_range.start).toLocaleDateString()} to {new Date(data.date_range.end).toLocaleDateString()}
-                      </>
-                    ) : (
-                      "Comprehensive analytics dashboard for communication data"
-                    )}
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                {data?.graph_type && (
-                  <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium capitalize">
-                    {data?.graph_type} View
-                  </span>
+    <div className="space-y-6">
+      {/* Header Section */}
+      <div className="bg-white shadow rounded-lg">
+        <div className="px-6 py-4 border-b border-gray-200">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+                {appliedFilters.data_type === "call" ? (
+                  <Phone className="w-5 h-5 text-green-600" />
+                ) : appliedFilters.data_type === "sms" ? (
+                  <MessageSquare className="w-5 h-5 text-blue-600" />
+                ) : (
+                  <TrendingUp className="w-5 h-5 text-purple-600" />
                 )}
-                <button
-                  onClick={() => dispatch(fetchData())}
-                  disabled={loading}
-                  className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
-                  <span className="font-medium">Refresh</span>
-                </button>
               </div>
+              <div>
+                <h2 className="text-lg font-medium text-gray-900">
+                  {appliedFilters.data_type === "both" ? "Call & SMS Analytics" : `${appliedFilters.data_type?.toUpperCase()} Analytics`}
+                </h2>
+                <p className="text-sm text-gray-600 mt-1">
+                  {data?.date_range?.start && data?.date_range?.end ? (
+                    <>
+                      {new Date(data.date_range.start).toLocaleDateString()} to {new Date(data.date_range.end).toLocaleDateString()}
+                    </>
+                  ) : (
+                    "Interactive chart showing your data over time"
+                  )}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              {appliedFilters.graph_type && (
+                <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-medium capitalize">
+                  {appliedFilters.graph_type} View
+                </span>
+              )}
+              <button
+                onClick={() => setShowFilters(!showFilters)}
+                className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+              >
+                <Filter className="w-4 h-4" />
+                <span className="font-medium">Filters</span>
+                <ChevronDown className={`w-4 h-4 transition-transform ${showFilters ? 'rotate-180' : ''}`} />
+              </button>
+              <button
+                onClick={() => dispatch(fetchData())}
+                disabled={loading}
+                className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
+                <span className="font-medium">Refresh</span>
+              </button>
             </div>
           </div>
         </div>
 
-        {/* Filters Section */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 mb-8">
-          <div className="px-8 py-6 border-b border-gray-200">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
-                <Filter className="w-5 h-5 text-gray-600" />
-              </div>
-              <div>
-                <h2 className="text-lg font-semibold text-gray-900">Filters & Settings</h2>
-                <p className="text-sm text-gray-600">Customize your data view with the options below</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="p-8">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Collapsible Filters Section */}
+        {showFilters && (
+          <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Date Range Group */}
               <div className="space-y-4">
                 <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wide">Date Range</h3>
@@ -292,7 +287,7 @@ const CallSMSBarChart = ({ viewMode }) => {
                           date_range: { ...prev.date_range, start: e.target.value },
                         }))
                       }
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                     />
                   </div>
                   <div>
@@ -306,7 +301,7 @@ const CallSMSBarChart = ({ viewMode }) => {
                           date_range: { ...prev.date_range, end: e.target.value },
                         }))
                       }
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                     />
                   </div>
                 </div>
@@ -321,7 +316,7 @@ const CallSMSBarChart = ({ viewMode }) => {
                     <select
                       value={localFilters.graph_type}
                       onChange={(e) => setLocalFilters((prev) => ({ ...prev, graph_type: e.target.value }))}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                     >
                       <option value="daily">Daily View</option>
                       <option value="weekly">Weekly View</option>
@@ -333,7 +328,7 @@ const CallSMSBarChart = ({ viewMode }) => {
                     <select
                       value={localFilters.data_type}
                       onChange={(e) => setLocalFilters((prev) => ({ ...prev, data_type: e.target.value }))}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                     >
                       <option value="call">Call Data Only</option>
                       <option value="sms">SMS Data Only</option>
@@ -367,19 +362,19 @@ const CallSMSBarChart = ({ viewMode }) => {
                           : { ...prev, location_ids: selected, company_ids: [] }
                       )
                     }}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors h-32"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors h-24"
                   >
                     {companyAccounts.map((item) => (
                       <option
                         key={viewMode === "company" ? item.company_id : item.location_id}
                         value={viewMode === "company" ? item.company_id : item.location_id}
-                        className="py-2"
+                        className="py-1"
                       >
                         {viewMode === "company" ? item.company_name : item.location_name}
                       </option>
                     ))}
                   </select>
-                  <p className="text-xs text-gray-500 mt-2">
+                  <p className="text-xs text-gray-500 mt-1">
                     Hold Ctrl/Cmd to select multiple items
                   </p>
                 </div>
@@ -387,16 +382,16 @@ const CallSMSBarChart = ({ viewMode }) => {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex items-center gap-4 mt-8 pt-6 border-t border-gray-200">
+            <div className="flex items-center gap-4 mt-6 pt-4 border-t border-gray-200">
               <button
                 onClick={handleApplyFilters}
                 disabled={loading}
-                className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm"
               >
                 {loading ? (
                   <div className="flex items-center gap-2">
                     <RefreshCw className="w-4 h-4 animate-spin" />
-                    Applying Filters...
+                    Applying...
                   </div>
                 ) : (
                   "Apply Filters"
@@ -405,146 +400,76 @@ const CallSMSBarChart = ({ viewMode }) => {
               <button
                 onClick={handleResetFilters}
                 disabled={loading}
-                className="px-8 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm"
               >
-                Reset to Default
+                Reset
               </button>
             </div>
           </div>
-        </div>
+        )}
 
-        {/* Statistics Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 mb-1">Total Data Points</p>
-                <p className="text-3xl font-bold text-gray-900">{data?.data?.length || 0}</p>
-                <p className="text-xs text-gray-500 mt-1">Records in selected period</p>
-              </div>
-              <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
-                <Calendar className="w-7 h-7 text-white" />
+        {/* Chart Content */}
+        <div className="p-6">
+          {loading ? (
+            <div className="h-96 flex items-center justify-center bg-gray-50 rounded-lg">
+              <div className="text-center">
+                <RefreshCw className="w-8 h-8 animate-spin text-blue-500 mx-auto mb-4" />
+                <p className="text-gray-600 font-medium">Loading chart data...</p>
+                <p className="text-sm text-gray-500 mt-1">Please wait while we fetch your analytics</p>
               </div>
             </div>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 mb-1">View Mode</p>
-                <p className="text-3xl font-bold text-gray-900 capitalize">{viewMode}</p>
-                <p className="text-xs text-gray-500 mt-1">Current analysis level</p>
-              </div>
-              <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center">
-                <Users className="w-7 h-7 text-white" />
+          ) : chartData.length === 0 ? (
+            <div className="h-96 flex items-center justify-center bg-gray-50 rounded-lg">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <AlertTriangle className="w-8 h-8 text-gray-400" />
+                </div>
+                <p className="text-gray-600 font-medium mb-2">No data available</p>
+                <p className="text-sm text-gray-500">Try adjusting your filters or date range</p>
               </div>
             </div>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 mb-1">Data Type</p>
-                <p className="text-3xl font-bold text-gray-900 capitalize">{data?.data_type || 'N/A'}</p>
-                <p className="text-xs text-gray-500 mt-1">Selected data category</p>
-              </div>
-              <div className="w-14 h-14 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center">
-                {appliedFilters.data_type === "call" ? (
-                  <Phone className="w-7 h-7 text-white" />
-                ) : appliedFilters.data_type === "sms" ? (
-                  <MessageSquare className="w-7 h-7 text-white" />
-                ) : (
-                  <TrendingUp className="w-7 h-7 text-white" />
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Chart Section */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-          <div className="px-8 py-6 border-b border-gray-200">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center">
-                  <TrendingUp className="w-5 h-5 text-white" />
-                </div>
-                <div>
-                  <h2 className="text-lg font-semibold text-gray-900">
-                    {data?.data_type === "both" ? "Call & SMS Trends" : `${data?.data_type?.toUpperCase()} Trends`}
-                  </h2>
-                  <p className="text-sm text-gray-600">Interactive chart showing your data over time</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                <span className="text-sm text-gray-600">Live Data</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="p-8">
-            {loading ? (
-              <div className="h-96 flex items-center justify-center bg-gray-50 rounded-lg">
-                <div className="text-center">
-                  <RefreshCw className="w-8 h-8 animate-spin text-blue-500 mx-auto mb-4" />
-                  <p className="text-gray-600 font-medium">Loading chart data...</p>
-                  <p className="text-sm text-gray-500 mt-1">Please wait while we fetch your analytics</p>
-                </div>
-              </div>
-            ) : chartData.length === 0 ? (
-              <div className="h-96 flex items-center justify-center bg-gray-50 rounded-lg">
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <AlertTriangle className="w-8 h-8 text-gray-400" />
-                  </div>
-                  <p className="text-gray-600 font-medium mb-2">No data available</p>
-                  <p className="text-sm text-gray-500">Try adjusting your filters or date range</p>
-                </div>
-              </div>
-            ) : (
-              <div className="h-96 overflow-x-auto">
-                <div style={{ width: `${Math.max(chartData.length * 80, 800)}px`, height: "400px" }}>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 80 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                      <XAxis
-                        dataKey="label"
-                        tick={{ fontSize: 12, fill: '#6b7280' }}
-                        stroke="#9ca3af"
-                        angle={-45}
-                        textAnchor="end"
-                        height={80}
+          ) : (
+            <div className="h-96 overflow-x-auto">
+              <div style={{ width: `${Math.max(chartData.length * 80, 800)}px`, height: "400px" }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 80 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                    <XAxis
+                      dataKey="label"
+                      tick={{ fontSize: 12, fill: '#6b7280' }}
+                      stroke="#9ca3af"
+                      angle={-45}
+                      textAnchor="end"
+                      height={80}
+                    />
+                    <YAxis 
+                      tick={{ fontSize: 12, fill: '#6b7280' }} 
+                      stroke="#9ca3af" 
+                      tickFormatter={(value) => value.toLocaleString()} 
+                    />
+                    <Tooltip content={<CustomTooltip />} />
+                    <Legend />
+                    {(appliedFilters.data_type === "call" || appliedFilters.data_type === "both") && (
+                      <Bar 
+                        dataKey="total_calls" 
+                        fill={colors.total_calls} 
+                        name="Total Calls" 
+                        radius={[4, 4, 0, 0]}
                       />
-                      <YAxis 
-                        tick={{ fontSize: 12, fill: '#6b7280' }} 
-                        stroke="#9ca3af" 
-                        tickFormatter={(value) => value.toLocaleString()} 
+                    )}
+                    {(appliedFilters.data_type === "sms" || appliedFilters.data_type === "both") && (
+                      <Bar 
+                        dataKey="total_sms" 
+                        fill={colors.total_sms} 
+                        name="Total SMS" 
+                        radius={[4, 4, 0, 0]}
                       />
-                      <Tooltip content={<CustomTooltip />} />
-                      <Legend />
-                      {(appliedFilters.data_type === "call" || appliedFilters.data_type === "both") && (
-                        <Bar 
-                          dataKey="total_calls" 
-                          fill={colors.total_calls} 
-                          name="Total Calls" 
-                          radius={[4, 4, 0, 0]}
-                        />
-                      )}
-                      {(appliedFilters.data_type === "sms" || appliedFilters.data_type === "both") && (
-                        <Bar 
-                          dataKey="total_sms" 
-                          fill={colors.total_sms} 
-                          name="Total SMS" 
-                          radius={[4, 4, 0, 0]}
-                        />
-                      )}
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
+                    )}
+                  </BarChart>
+                </ResponsiveContainer>
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -14,14 +14,14 @@ const CallSMSBarChart = ({ viewMode, global_filters }) => {
   const [showFilters, setShowFilters] = useState(false)
 
   const today = new Date()
-  const fiveYearsAgo = new Date()
-  fiveYearsAgo.setFullYear(today.getFullYear() - 5)
+  const oneYearAgo = new Date()
+  oneYearAgo.setFullYear(today.getFullYear() - 1)
 
   const formatDate = (date) => date.toISOString().split("T")[0]
 
   const [localFilters, setLocalFilters] = useState({
     date_range: {
-      start: global_filters?.dateRange?.start || formatDate(fiveYearsAgo),
+      start: global_filters?.dateRange?.start || formatDate(oneYearAgo),
       end: global_filters?.dateRange?.end || formatDate(today),
     },
     company_ids: filters?.company_ids || [],
@@ -42,7 +42,7 @@ const CallSMSBarChart = ({ viewMode, global_filters }) => {
     dispatch(setcallsmsFilters(updatedFilters))
     setAppliedFilters(updatedFilters)
     dispatch(resetCompanyAccounts());
-    dispatch(fetchData(localFilters))
+    dispatch(fetchData(updatedFilters))
     if (viewMode === "company" || viewMode === "account") {
         dispatch(fetchCompanyAccounts(viewMode))
     }
@@ -176,7 +176,7 @@ const CallSMSBarChart = ({ viewMode, global_filters }) => {
     }
     dispatch(setcallsmsFilters(filtersToApply))
     setAppliedFilters(filtersToApply)
-    dispatch(fetchData(localFilters))
+    dispatch(fetchData(filtersToApply))
   }
 
   // const handleResetFilters = () => {

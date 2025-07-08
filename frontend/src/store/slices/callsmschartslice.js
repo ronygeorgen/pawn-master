@@ -13,17 +13,19 @@ const initialState = {
 export const fetchData = createAsyncThunk(
   'callsms/fetchData',
   async (filters, { getState, rejectWithValue }) => {
+    console.log(filters, 'filterssss');
+    
     try {
       const today = new Date();
-      const fiveYearsAgo = new Date();
-      fiveYearsAgo.setFullYear(today.getFullYear() - 5);
+      const oneYearAgo = new Date();
+      oneYearAgo.setFullYear(today.getFullYear() - 1);
 
-      console.log(fiveYearsAgo, 'fivee');
+      console.log(oneYearAgo, 'onee');
       
       
       const {
         date_range = {
-          start: fiveYearsAgo.toISOString().split('T')[0],
+          start: oneYearAgo.toISOString().split('T')[0],
           end: today.toISOString().split('T')[0],
         },
         location_ids = [],

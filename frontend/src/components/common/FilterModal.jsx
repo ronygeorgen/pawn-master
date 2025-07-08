@@ -33,9 +33,10 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { apiService } from '../../services/api';
 
 const getDefaultDateRange = () => {
-  const today = new Date();
-  const pastDate = new Date();
-  pastDate.setFullYear(today.getFullYear() - 5);
+
+    const today = new Date();
+    const pastDate = new Date();
+    pastDate.setFullYear(today.getFullYear() - 1);
 
   return {
     start: pastDate,

@@ -30,8 +30,6 @@ const CallSMSBarChart = ({ viewMode, global_filters }) => {
     data_type: filters?.data_type || "both",
   })
 
-  const [appliedFilters, setAppliedFilters] = useState(localFilters)
-
   useEffect(() => {
     const updatedFilters = {
         ...localFilters,
@@ -40,13 +38,16 @@ const CallSMSBarChart = ({ viewMode, global_filters }) => {
         location_ids: viewMode === "account" ? localFilters.location_ids : [],
     };
     dispatch(setcallsmsFilters(updatedFilters))
-    setAppliedFilters(updatedFilters)
     dispatch(resetCompanyAccounts());
     dispatch(fetchData(updatedFilters))
     if (viewMode === "company" || viewMode === "account") {
         dispatch(fetchCompanyAccounts(viewMode))
     }
   }, [dispatch, viewMode])
+
+  useEffect(() => {
+    setLocalFilters(filters);
+  }, [filters]);
 
   const chartData = useMemo(() => {
   if (!data?.data || !Array.isArray(data.data)) return []
@@ -58,9 +59,9 @@ const CallSMSBarChart = ({ viewMode, global_filters }) => {
     if (isNaN(date.getTime())) return
 
     let label = ""
-    if (appliedFilters.graph_type === "daily") {
+    if (filters.graph_type === "daily") {
       label = date.toLocaleDateString("en-IN")
-    } else if (appliedFilters.graph_type === "weekly") {
+    } else if (filters.graph_type === "weekly") {
       const weekNumber = Math.ceil(date.getDate() / 7)
       label = `Week ${weekNumber} - ${date.toLocaleDateString("en-US", {
         month: "short",
@@ -90,7 +91,7 @@ const CallSMSBarChart = ({ viewMode, global_filters }) => {
 
     const group = groupedData[label]
 
-    if (appliedFilters.data_type === "call" || appliedFilters.data_type === "both") {
+    if (filters.data_type === "call" || filters.data_type === "both") {
       group.total_calls += item.call_data?.total_calls || 0
       group.inbound_calls += item.call_data?.inbound_calls || 0
       group.outbound_calls += item.call_data?.outbound_calls || 0
@@ -98,7 +99,7 @@ const CallSMSBarChart = ({ viewMode, global_filters }) => {
       group.total_usage += item.call_data?.total_usage || 0
     }
 
-    if (appliedFilters.data_type === "sms" || appliedFilters.data_type === "both") {
+    if (filters.data_type === "sms" || filters.data_type === "both") {
       group.total_sms += item.sms_data?.total_messages || 0
       group.inbound_messages += item.sms_data?.inbound_messages || 0
       group.outbound_messages += item.sms_data?.outbound_messages || 0
@@ -107,7 +108,7 @@ const CallSMSBarChart = ({ viewMode, global_filters }) => {
   })
 
   return Object.values(groupedData)
-}, [data?.data, appliedFilters])
+}, [data?.data, filters])
 
   const colors = {
     total_calls: "#10b981",
@@ -126,7 +127,7 @@ const CallSMSBarChart = ({ viewMode, global_filters }) => {
         </div>
 
         <div className="space-y-3">
-          {(appliedFilters.data_type === 'call' || appliedFilters.data_type === 'both') && (
+          {(filters.data_type === 'call' || filters.data_type === 'both') && (
             <div className="bg-green-50 rounded-lg p-3">
               <div className="flex items-center gap-2 mb-2">
                 <Phone className="w-4 h-4 text-green-600" />
@@ -141,7 +142,7 @@ const CallSMSBarChart = ({ viewMode, global_filters }) => {
             </div>
           )}
 
-          {(appliedFilters.data_type === 'sms' || appliedFilters.data_type === 'both') && (
+          {(filters.data_type === 'sms' || filters.data_type === 'both') && (
             <div className="bg-blue-50 rounded-lg p-3">
               <div className="flex items-center gap-2 mb-2">
                 <MessageSquare className="w-4 h-4 text-blue-600" />
@@ -175,7 +176,6 @@ const CallSMSBarChart = ({ viewMode, global_filters }) => {
         : { location_ids: localFilters.location_ids }),
     }
     dispatch(setcallsmsFilters(filtersToApply))
-    setAppliedFilters(filtersToApply)
     dispatch(fetchData(filtersToApply))
   }
 
@@ -192,7 +192,6 @@ const CallSMSBarChart = ({ viewMode, global_filters }) => {
   //   ...(viewMode === "company" ? { company_ids: [] } : { location_ids: [] }),
   //   }
   //   setLocalFilters(defaultFilters)
-  //   setAppliedFilters(defaultFilters)
   //   dispatch(setcallsmsFilters(defaultFilters))
   //   dispatch(fetchData(localFilters))
   // }
@@ -227,9 +226,9 @@ const CallSMSBarChart = ({ viewMode, global_filters }) => {
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
-                {appliedFilters.data_type === "call" ? (
+                {filters.data_type === "call" ? (
                   <Phone className="w-5 h-5 text-green-600" />
-                ) : appliedFilters.data_type === "sms" ? (
+                ) : filters.data_type === "sms" ? (
                   <MessageSquare className="w-5 h-5 text-blue-600" />
                 ) : (
                   <TrendingUp className="w-5 h-5 text-purple-600" />
@@ -237,7 +236,7 @@ const CallSMSBarChart = ({ viewMode, global_filters }) => {
               </div>
               <div>
                 <h2 className="text-lg font-medium text-gray-900">
-                  {appliedFilters.data_type === "both" ? "Call & SMS Analytics" : `${appliedFilters.data_type?.toUpperCase()} Analytics`}
+                  {filters.data_type === "both" ? "Call & SMS Analytics" : `${filters.data_type?.toUpperCase()} Analytics`}
                 </h2>
                 <p className="text-sm text-gray-600 mt-1">
                   {data?.date_range?.start && data?.date_range?.end ? (
@@ -251,9 +250,9 @@ const CallSMSBarChart = ({ viewMode, global_filters }) => {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              {appliedFilters.graph_type && (
+              {filters.graph_type && (
                 <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-medium capitalize">
-                  {appliedFilters.graph_type} View
+                  {filters.graph_type} View
                 </span>
               )}
               <button
@@ -398,7 +397,7 @@ const CallSMSBarChart = ({ viewMode, global_filters }) => {
                     />
                     <Tooltip content={<CustomTooltip />} />
                     <Legend />
-                    {(appliedFilters.data_type === "call" || appliedFilters.data_type === "both") && (
+                    {(filters.data_type === "call" || filters.data_type === "both") && (
                       <Bar 
                         dataKey="total_calls" 
                         fill={colors.total_calls} 
@@ -406,7 +405,7 @@ const CallSMSBarChart = ({ viewMode, global_filters }) => {
                         radius={[4, 4, 0, 0]}
                       />
                     )}
-                    {(appliedFilters.data_type === "sms" || appliedFilters.data_type === "both") && (
+                    {(filters.data_type === "sms" || filters.data_type === "both") && (
                       <Bar 
                         dataKey="total_sms" 
                         fill={colors.total_sms} 

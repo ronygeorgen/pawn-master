@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { X, Filter } from 'lucide-react';
 import Button from './Button';
 import { apiService } from '../../services/api';
+import { useSelector } from 'react-redux';
 
 const getDefaultDateRange = () => {
     const today = new Date();
@@ -16,7 +17,7 @@ const getDefaultDateRange = () => {
     };
   };
 
-const FilterModal = ({ isOpen, onClose, filters, onApplyFilters, onResetFilters }) => {
+const FilterModal = ({ isOpen, onClose, filters, onApplyFilters, onResetFilters, onCompanySelected }) => {
   const [localFilters, setLocalFilters] = useState(() => {
     const start = filters?.dateRange?.start || getDefaultDateRange().start;
     const end = filters?.dateRange?.end || getDefaultDateRange().end;
@@ -34,6 +35,7 @@ const FilterModal = ({ isOpen, onClose, filters, onApplyFilters, onResetFilters 
   const [showCompanySuggestions, setShowCompanySuggestions] = useState(false);
   const suggestionsRef = useRef();
 
+  const { viewMode } = useSelector(state => state.userData);
 
   useEffect(() => {
     const start = filters?.dateRange?.start || getDefaultDateRange().start;
@@ -111,6 +113,9 @@ const handleCompanySuggestionClick = (company) => {
       company_name: company.company_name
     },
   }));
+  if (viewMode === 'account' && onCompanySelected) {
+    onCompanySelected(company.company_id);
+  }
   setShowCompanySuggestions(false);
 };
 

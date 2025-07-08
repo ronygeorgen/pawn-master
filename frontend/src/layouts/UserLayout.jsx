@@ -5,6 +5,7 @@ import { BarChart3, Filter } from 'lucide-react';
 import { setViewMode, setFilters, fetchUserData } from '../store/slices/userDataSlice';
 import FilterModal from '../components/common/FilterModal';
 import { fetchData, setcallsmsFilters } from '../store/slices/callsmschartslice';
+import { apiService } from '../services/api';
 
 const UserLayout = () => {
   const dispatch = useDispatch();
@@ -28,6 +29,8 @@ const UserLayout = () => {
     dispatch(setcallsmsFilters({date_range:newFilters.dateRange, view_type:viewMode}))
     // Pass filters and viewMode directly to avoid race conditions
     dispatch(fetchUserData({ filters: newFilters, viewMode }));
+    console.log(localFilters, 'loccc');
+    
     dispatch(fetchData({...localFilters, date_range:newFilters.dateRange, view_type:viewMode}))
   };
 
@@ -45,6 +48,23 @@ const UserLayout = () => {
     // Pass reset filters and current viewMode directly
     dispatch(fetchUserData({ filters: resetData, viewMode }));
     dispatch(fetchData(localFilters))
+  };
+
+  const handleCompanySelected = async (companyId) => {
+    if (viewMode !== "account") return;
+
+    try {
+      const res = await apiService.get(`/accounts/get-company-account-only/?company_id=${companyId}`);
+      console.log(res, 'loffff');
+      const locationIds = res.map(loc => loc.location_id);
+
+      dispatch(setcallsmsFilters({
+        ...localFilters,
+        location_ids: locationIds,
+      }));
+    } catch (error) {
+      console.error("Error fetching locations for company:", error);
+    }
   };
 
   return (
@@ -122,6 +142,7 @@ const UserLayout = () => {
         filters={filters}
         onApplyFilters={handleApplyFilters}
         onResetFilters={handleResetFilters}
+        onCompanySelected={handleCompanySelected}
       />
     </div>
   );

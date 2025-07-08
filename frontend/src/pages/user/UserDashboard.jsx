@@ -214,12 +214,12 @@ const UserDashboard = () => {
     </div>
   );
 
-  console.log(refreshingCall, 'call');
+  console.log(filters, 'call');
   
 
   return (
     <div className="space-y-6">
-      <CallSMSBarChart viewMode={viewMode}/>
+      <CallSMSBarChart viewMode={viewMode} global_filters={filters}/>
       {/* Data Table Section */}
       <div className="bg-white shadow rounded-lg">
         <div className="px-6 py-4 border-b border-gray-200">

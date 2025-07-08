@@ -4,10 +4,12 @@ import { Outlet, Link } from 'react-router-dom';
 import { BarChart3, Filter } from 'lucide-react';
 import { setViewMode, setFilters, fetchUserData } from '../store/slices/userDataSlice';
 import FilterModal from '../components/common/FilterModal';
+import { fetchData, setcallsmsFilters } from '../store/slices/callsmschartslice';
 
 const UserLayout = () => {
   const dispatch = useDispatch();
   const { viewMode, filters } = useSelector(state => state.userData);
+  const localFilters = useSelector(state=>state.callsms.filters)
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
 
   const handleViewModeToggle = () => {
@@ -23,9 +25,10 @@ const UserLayout = () => {
   const handleApplyFilters = (newFilters) => {
     console.log('Applying filters:', newFilters, 'with viewMode:', viewMode);
     dispatch(setFilters(newFilters));
-    
+    dispatch(setcallsmsFilters({date_range:newFilters.dateRange}))
     // Pass filters and viewMode directly to avoid race conditions
     dispatch(fetchUserData({ filters: newFilters, viewMode }));
+    dispatch(fetchData({...localFilters, date_range:newFilters.dateRange}))
   };
 
   const handleResetFilters = () => {
@@ -41,6 +44,7 @@ const UserLayout = () => {
     
     // Pass reset filters and current viewMode directly
     dispatch(fetchUserData({ filters: resetData, viewMode }));
+    dispatch(fetchData(localFilters))
   };
 
   return (

@@ -3,8 +3,31 @@ import { X, Filter } from 'lucide-react';
 import Button from './Button';
 import { apiService } from '../../services/api';
 
+const getDefaultDateRange = () => {
+    const today = new Date();
+    const pastDate = new Date();
+    pastDate.setFullYear(today.getFullYear() - 5);
+
+    const format = (date) => date.toISOString().split("T")[0];
+
+    return {
+      start: format(pastDate),
+      end: format(today),
+    };
+  };
+
 const FilterModal = ({ isOpen, onClose, filters, onApplyFilters, onResetFilters }) => {
-  const [localFilters, setLocalFilters] = useState(filters);
+  const [localFilters, setLocalFilters] = useState(() => {
+    const start = filters?.dateRange?.start || getDefaultDateRange().start;
+    const end = filters?.dateRange?.end || getDefaultDateRange().end;
+
+    return {
+      company: filters?.company || { id: null, company_name: '' },
+      category: filters?.category || { id: null, category_name: '' },
+      dateRange: { start, end },
+    };
+  });
+
   const [categorySuggestions, setCategorySuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [companySuggestions, setCompanySuggestions] = useState([]);
@@ -13,7 +36,14 @@ const FilterModal = ({ isOpen, onClose, filters, onApplyFilters, onResetFilters 
 
 
   useEffect(() => {
-    setLocalFilters(filters);
+    const start = filters?.dateRange?.start || getDefaultDateRange().start;
+    const end = filters?.dateRange?.end || getDefaultDateRange().end;
+
+    setLocalFilters({
+      company: filters?.company || { id: null, company_name: '' },
+      category: filters?.category || { id: null, category_name: '' },
+      dateRange: { start, end },
+    });
   }, [filters]);
 
   useEffect(() => {

@@ -12,18 +12,18 @@ const initialState = {
 
 export const fetchData = createAsyncThunk(
   'callsms/fetchData',
-  async (_, { getState, rejectWithValue }) => {
+  async (filters, { getState, rejectWithValue }) => {
     try {
-      const state = getState().callsms;
-      const { filters } = state;
-
       const today = new Date();
-      const threeYearsAgo = new Date();
-      threeYearsAgo.setFullYear(today.getFullYear() - 3);
+      const fiveYearsAgo = new Date();
+      fiveYearsAgo.setFullYear(today.getFullYear() - 5);
+
+      console.log(fiveYearsAgo, 'fivee');
+      
       
       const {
         date_range = {
-          start: threeYearsAgo.toISOString().split('T')[0],
+          start: fiveYearsAgo.toISOString().split('T')[0],
           end: today.toISOString().split('T')[0],
         },
         location_ids = [],
@@ -70,7 +70,7 @@ const callsmsSlice = createSlice({
   name: 'callsms',
   initialState,
   reducers: {
-    setFilters: (state, action) => {
+    setcallsmsFilters: (state, action) => {
       state.filters = { ...state.filters, ...action.payload };
     },
     clear: (state) => {
@@ -93,5 +93,5 @@ const callsmsSlice = createSlice({
   }
 })
 
-export const { setFilters, clear, resetCompanyAccounts } = callsmsSlice.actions;
+export const { setcallsmsFilters, clear, resetCompanyAccounts } = callsmsSlice.actions;
 export default callsmsSlice.reducer;

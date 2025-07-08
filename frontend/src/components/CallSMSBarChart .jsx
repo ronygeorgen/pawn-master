@@ -4,9 +4,9 @@ import { useState, useMemo, useEffect } from "react"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts"
 import { Calendar, Phone, MessageSquare, Filter, RefreshCw, AlertTriangle, TrendingUp, Users, Clock, ChevronDown } from "lucide-react"
 import { useDispatch, useSelector } from "react-redux"
-import { fetchCompanyAccounts, fetchData, resetCompanyAccounts, setFilters } from "../store/slices/callsmschartslice"
+import { fetchCompanyAccounts, fetchData, resetCompanyAccounts, setcallsmsFilters } from "../store/slices/callsmschartslice"
 
-const CallSMSBarChart = ({ viewMode }) => {
+const CallSMSBarChart = ({ viewMode, global_filters }) => {
   console.log(viewMode, 'viewMode');
   
   const dispatch = useDispatch()
@@ -14,15 +14,15 @@ const CallSMSBarChart = ({ viewMode }) => {
   const [showFilters, setShowFilters] = useState(false)
 
   const today = new Date()
-  const threeYearsAgo = new Date()
-  threeYearsAgo.setFullYear(today.getFullYear() - 3)
+  const fiveYearsAgo = new Date()
+  fiveYearsAgo.setFullYear(today.getFullYear() - 5)
 
   const formatDate = (date) => date.toISOString().split("T")[0]
 
   const [localFilters, setLocalFilters] = useState({
     date_range: {
-      start: filters?.date_range?.start || formatDate(threeYearsAgo),
-      end: filters?.date_range?.end || formatDate(today),
+      start: global_filters?.dateRange?.start || formatDate(fiveYearsAgo),
+      end: global_filters?.dateRange?.end || formatDate(today),
     },
     company_ids: filters?.company_ids || [],
     location_ids: filters?.location_ids || [],
@@ -39,10 +39,10 @@ const CallSMSBarChart = ({ viewMode }) => {
         company_ids: viewMode === "company" ? localFilters.company_ids : [],
         location_ids: viewMode === "account" ? localFilters.location_ids : [],
     };
-    dispatch(setFilters(updatedFilters))
+    dispatch(setcallsmsFilters(updatedFilters))
     setAppliedFilters(updatedFilters)
     dispatch(resetCompanyAccounts());
-    dispatch(fetchData())
+    dispatch(fetchData(localFilters))
     if (viewMode === "company" || viewMode === "account") {
         dispatch(fetchCompanyAccounts(viewMode))
     }
@@ -174,28 +174,28 @@ const CallSMSBarChart = ({ viewMode }) => {
         ? { company_ids: localFilters.company_ids }
         : { location_ids: localFilters.location_ids }),
     }
-    dispatch(setFilters(filtersToApply))
+    dispatch(setcallsmsFilters(filtersToApply))
     setAppliedFilters(filtersToApply)
-    dispatch(fetchData())
+    dispatch(fetchData(localFilters))
   }
 
-  const handleResetFilters = () => {
-    const defaultFilters = {
-      date_range: {
-        start: formatDate(threeYearsAgo),
-        end: formatDate(today),
-      },
-      location_ids: [],
-      graph_type: "monthly",
-      data_type: "both",
-      view_type: viewMode,
-    ...(viewMode === "company" ? { company_ids: [] } : { location_ids: [] }),
-    }
-    setLocalFilters(defaultFilters)
-    setAppliedFilters(defaultFilters)
-    dispatch(setFilters(defaultFilters))
-    dispatch(fetchData())
-  }
+  // const handleResetFilters = () => {
+  //   const defaultFilters = {
+  //     date_range: {
+  //       start: formatDate(threeYearsAgo),
+  //       end: formatDate(today),
+  //     },
+  //     location_ids: [],
+  //     graph_type: "monthly",
+  //     data_type: "both",
+  //     view_type: viewMode,
+  //   ...(viewMode === "company" ? { company_ids: [] } : { location_ids: [] }),
+  //   }
+  //   setLocalFilters(defaultFilters)
+  //   setAppliedFilters(defaultFilters)
+  //   dispatch(setcallsmsFilters(defaultFilters))
+  //   dispatch(fetchData(localFilters))
+  // }
 
   if (error) {
     return (
@@ -208,7 +208,7 @@ const CallSMSBarChart = ({ viewMode }) => {
             <h3 className="text-lg font-semibold text-red-900 mb-2">Error Loading Data</h3>
             <p className="text-red-700 text-sm leading-relaxed">{error}</p>
             <button
-              onClick={() => dispatch(fetchData())}
+              onClick={() => dispatch(fetchData(localFilters))}
               className="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium"
             >
               Try Again
@@ -242,7 +242,7 @@ const CallSMSBarChart = ({ viewMode }) => {
                 <p className="text-sm text-gray-600 mt-1">
                   {data?.date_range?.start && data?.date_range?.end ? (
                     <>
-                      {new Date(data.date_range.start).toLocaleDateString()} to {new Date(data.date_range.end).toLocaleDateString()}
+                      {new Date(data.date_range.start).toLocaleDateString('en-GB')} to {new Date(data.date_range.end).toLocaleDateString('en-GB')}
                     </>
                   ) : (
                     "Interactive chart showing your data over time"
@@ -264,14 +264,6 @@ const CallSMSBarChart = ({ viewMode }) => {
                 <span className="font-medium">Filters</span>
                 <ChevronDown className={`w-4 h-4 transition-transform ${showFilters ? 'rotate-180' : ''}`} />
               </button>
-              <button
-                onClick={() => dispatch(fetchData())}
-                disabled={loading}
-                className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
-                <span className="font-medium">Refresh</span>
-              </button>
             </div>
           </div>
         </div>
@@ -281,7 +273,7 @@ const CallSMSBarChart = ({ viewMode }) => {
           <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Date Range Group */}
-              <div className="space-y-4">
+              {/* <div className="space-y-4">
                 <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wide">Date Range</h3>
                 <div className="space-y-3">
                   <div>
@@ -313,7 +305,7 @@ const CallSMSBarChart = ({ viewMode }) => {
                     />
                   </div>
                 </div>
-              </div>
+              </div> */}
 
               {/* Data Settings Group */}
               <div className="space-y-4">
@@ -405,13 +397,13 @@ const CallSMSBarChart = ({ viewMode }) => {
                   "Apply Filters"
                 )}
               </button>
-              <button
+              {/* <button
                 onClick={handleResetFilters}
                 disabled={loading}
                 className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm"
               >
                 Reset
-              </button>
+              </button> */}
             </div>
           </div>
         )}

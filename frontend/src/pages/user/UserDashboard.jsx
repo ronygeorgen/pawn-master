@@ -398,7 +398,7 @@ const UserDashboard = () => {
                         {/* Expandable content for both views */}
                         {expandedRows[idx] && (
                           <tr>
-                            <td colSpan={viewMode === 'account' ? 6 : 5} className="px-6 py-4 bg-gray-50">
+                            <td colSpan={6} className="px-6 py-4 bg-gray-50">
                               {expandedRows[idx] === 'sms' && renderSMSDetails(item)}
                               {expandedRows[idx] === 'call' && renderCallDetails(item)}
                               {expandedRows[idx] === 'full' && renderFullDetails(item)}

@@ -179,7 +179,7 @@ const CallSMSBarChart = ({ viewMode }) => {
       },
       location_ids: [],
       graph_type: "monthly",
-      data_type: "call",
+      data_type: "both",
       view_type: viewMode,
     ...(viewMode === "company" ? { company_ids: [] } : { location_ids: [] }),
     }

@@ -53,10 +53,10 @@ class UserDataService {
     }
   }
 
-  async refreshWalletService(location_id) {
-    console.log(location_id, 'location_id');
+  async refreshWalletService(query_name, id) {
+    console.log(query_name, 'location_id');
     
-    const response = location_id ? await apiService.get(`/accounts/sync-wallets/?location_id=${location_id}`) : await apiService.get(`/accounts/sync-wallets/`);
+    const response = await apiService.get(`/accounts/sync-wallets/?${query_name}=${id}`);
     return response
   }
 

@@ -67,27 +67,26 @@ const UserDashboard = () => {
     }));
   };
 
-  const handleWalletRefresh = async (locationId) => {
-    setRefreshingWallet(locationId);
+  const handleRowRefresh = async (item) => {
+    const id = viewMode === 'company' ? item.company_id : item.location_id;
+    const query_name = viewMode === 'company' ? 'company_id' : 'location_id';
+
+    setRefreshingCall({ query_name, id });
+    setRefreshingWallet(id);
+
     try {
-      await dispatch(refreshWallet(locationId)).unwrap();
+      await Promise.all([
+        dispatch(refreshCall({ query_name, id })).unwrap(),
+        dispatch(refreshWallet({ query_name, id })).unwrap(),
+      ]);
     } catch (error) {
-      console.error('Error refreshing wallet:', error);
+      console.error("Error refreshing data:", error);
     } finally {
+      setRefreshingCall(null);
       setRefreshingWallet(null);
     }
   };
 
-  const handleCallRefresh = async (query_name, id) => {
-    setRefreshingCall({query_name, id});
-    try {
-      await dispatch(refreshCall({query_name, id})).unwrap();
-    } catch (error) {
-      console.error('Error refreshing call:', error);
-    } finally {
-      setRefreshingCall(null);
-    }
-  };
   
 
   const formatMinutesToHours=(totalMinutes)=> {
@@ -332,21 +331,7 @@ const UserDashboard = () => {
                                   <ChevronRight className="w-4 h-4 text-green-600" />
                                 )}
                               </button>
-                              <button
-                                onClick={() =>
-                                  viewMode === 'company'
-                                    ? handleCallRefresh('company_id', item?.company_id)
-                                    : handleCallRefresh('location_id', item?.location_id)
-                                }
-                                className="w-6 h-6 flex items-center justify-center p-1 rounded-full hover:bg-purple-100 transition-colors"
-                              >
-                                <RefreshCw className={`w-4 h-4 text-purple-600 ${
-                                  refreshingCall &&
-                                  item[refreshingCall.query_name] === refreshingCall.id
-                                    ? 'animate-spin'
-                                    : ''
-                                }`} />
-                              </button>
+                              
                             </div>
                           </td>
 
@@ -379,18 +364,19 @@ const UserDashboard = () => {
                                     : item.combined_totals?.total_wallet_balance || 0
                                 )}
                               </div>
-                              {viewMode === 'account' && (
-                                <button
-                                  onClick={() => handleWalletRefresh(item?.location_id)}
-                                  className="w-6 h-6 flex items-center justify-center p-1 rounded-full hover:bg-purple-100 transition-colors"
-                                >
-                                  <RefreshCw
-                                    className={`w-4 h-4 text-purple-600 ${
-                                      refreshingWallet === item.location_id ? 'animate-spin' : ''
-                                    }`}
-                                  />
-                                </button>
-                              )}
+                              <button
+                                onClick={() => handleRowRefresh(item)}
+                                className="w-6 h-6 flex items-center justify-center p-1 rounded-full hover:bg-blue-100 transition-colors"
+                              >
+                                <RefreshCw
+                                  className={`w-4 h-4 text-blue-600 ${
+                                    (refreshingCall && item[refreshingCall.query_name] === refreshingCall.id) ||
+                                    refreshingWallet === (viewMode === 'company' ? item.company_id : item.location_id)
+                                      ? 'animate-spin'
+                                      : ''
+                                  }`}
+                                />
+                              </button>
                             </div>
                           </td>
                         </tr>

@@ -26,10 +26,10 @@ export const fetchUserData = createAsyncThunk(
 
 export const refreshWallet = createAsyncThunk(
   'userData/refreshWallet',
-  async (location_id, {rejectWithValue}) => {
-    console.log(location_id, 'from slice acrtion');
+  async ({query_name, id}, {rejectWithValue}) => {
+    console.log(query_name, 'from slice acrtion');
     try{
-      return await userDataService.refreshWalletService(location_id);
+      return await userDataService.refreshWalletService(query_name, id);
     }
     catch(error){
       return rejectWithValue(error)

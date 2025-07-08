@@ -5,9 +5,10 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsive
 import { Calendar, Phone, MessageSquare, Filter, RefreshCw, AlertTriangle, TrendingUp, Users, Clock, ChevronDown } from "lucide-react"
 import { useDispatch, useSelector } from "react-redux"
 import { fetchCompanyAccounts, fetchData, resetCompanyAccounts, setcallsmsFilters } from "../store/slices/callsmschartslice"
+import { apiService } from "../services/api"
 
 const CallSMSBarChart = ({ viewMode, global_filters }) => {
-  console.log(viewMode, 'viewMode');
+  console.log(viewMode, 'viewMode', global_filters);
   
   const dispatch = useDispatch()
   const { data, filters, loading, error, companyAccounts } = useSelector((state) => state.callsms)
@@ -24,6 +25,7 @@ const CallSMSBarChart = ({ viewMode, global_filters }) => {
       start: global_filters?.dateRange?.start || formatDate(oneYearAgo),
       end: global_filters?.dateRange?.end || formatDate(today),
     },
+    category_id: global_filters?.category?.id,
     company_ids: filters?.company_ids || [],
     location_ids: filters?.location_ids || [],
     graph_type: filters?.graph_type || "monthly",
@@ -32,18 +34,41 @@ const CallSMSBarChart = ({ viewMode, global_filters }) => {
 
   useEffect(() => {
     const updatedFilters = {
-        ...localFilters,
-        view_type: viewMode,
-        company_ids: viewMode === "company" ? localFilters.company_ids : [],
-        location_ids: viewMode === "account" ? localFilters.location_ids : [],
+      ...localFilters,
+      view_type: viewMode,
+      company_ids: localFilters.company_ids,
+      location_ids: localFilters.location_ids,
     };
-    dispatch(setcallsmsFilters(updatedFilters))
+
+    const handleCompanySelected = async (companyId) => {
+      try {
+        const res = await apiService.get(`/accounts/get-company-account-only/?company_id=${companyId}`);
+        const locationIds = res.map(loc => loc.location_id);
+
+        const newFilters = {
+          ...updatedFilters,
+          location_ids: locationIds,
+        };
+
+        dispatch(setcallsmsFilters(newFilters));        
+        dispatch(fetchData(newFilters));
+      } catch (error) {
+        console.error("Error fetching locations for company:", error);
+      }
+    };
+
+    dispatch(setcallsmsFilters(updatedFilters));
     dispatch(resetCompanyAccounts());
-    dispatch(fetchData(updatedFilters))
-    if (viewMode === "company" || viewMode === "account") {
-        dispatch(fetchCompanyAccounts(viewMode))
+    dispatch(fetchCompanyAccounts(viewMode));
+
+    if (viewMode === "account") {
+      // Automatically fetch location_ids for the selected company
+      handleCompanySelected(global_filters?.company?.id);
+    } else {
+      // Fallback for other view modes or multiple companies selected
+      dispatch(fetchData(updatedFilters));
     }
-  }, [dispatch, viewMode])
+  }, [dispatch, viewMode]);
 
   useEffect(() => {
     setLocalFilters(filters);
@@ -167,6 +192,7 @@ const CallSMSBarChart = ({ viewMode, global_filters }) => {
       return
     }
     const filtersToApply = {
+        category_id:localFilters?.category_id,
         date_range: localFilters.date_range,
         graph_type: localFilters.graph_type,
         data_type: localFilters.data_type,

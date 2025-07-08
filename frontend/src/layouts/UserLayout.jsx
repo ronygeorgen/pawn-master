@@ -25,13 +25,25 @@ const UserLayout = () => {
 
   const handleApplyFilters = (newFilters) => {
     console.log('Applying filters:', newFilters, 'with viewMode:', viewMode);
+    const company_ids = newFilters?.company?.id ? [newFilters.company.id] : [];
+    const category_id = newFilters?.category?.id;
+
+    const basePayload = {
+      date_range: newFilters.dateRange,
+      view_type: viewMode,
+      company_ids,
+    };
+
+    if (category_id) {
+      basePayload.category_id = category_id;
+    }
+
     dispatch(setFilters(newFilters));
-    dispatch(setcallsmsFilters({date_range:newFilters.dateRange, view_type:viewMode}))
+    dispatch(setcallsmsFilters(basePayload))
     // Pass filters and viewMode directly to avoid race conditions
     dispatch(fetchUserData({ filters: newFilters, viewMode }));
-    console.log(localFilters, 'loccc');
     
-    dispatch(fetchData({...localFilters, date_range:newFilters.dateRange, view_type:viewMode}))
+    dispatch(fetchData({...localFilters, ...basePayload}))
   };
 
   const handleResetFilters = () => {

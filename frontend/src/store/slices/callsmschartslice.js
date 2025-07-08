@@ -39,8 +39,9 @@ export const fetchData = createAsyncThunk(
         graph_type,
         data_type,
         view_type,
-        ...(filters?.company_ids?.length ? { company_ids: filters.company_ids } : {}),
-        ...(filters?.location_ids?.length ? { location_ids: filters.location_ids } : {}),
+        category_id:filters?.category_id,
+        company_ids: view_type === "company" ? filters.company_ids : [],
+        location_ids: view_type === "account" ? filters.location_ids : [],
         };
 
       const response = await apiService.post('accounts/analytics/bar-graph-analytics/', payload);

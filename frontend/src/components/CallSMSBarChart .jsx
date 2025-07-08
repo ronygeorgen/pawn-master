@@ -271,79 +271,38 @@ const CallSMSBarChart = ({ viewMode, global_filters }) => {
         {/* Collapsible Filters Section */}
         {showFilters && (
           <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Date Range Group */}
-              {/* <div className="space-y-4">
-                <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wide">Date Range</h3>
-                <div className="space-y-3">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Start Date</label>
-                    <input
-                      type="date"
-                      value={localFilters.date_range.start}
-                      onChange={(e) =>
-                        setLocalFilters((prev) => ({
-                          ...prev,
-                          date_range: { ...prev.date_range, start: e.target.value },
-                        }))
-                      }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">End Date</label>
-                    <input
-                      type="date"
-                      value={localFilters.date_range.end}
-                      onChange={(e) =>
-                        setLocalFilters((prev) => ({
-                          ...prev,
-                          date_range: { ...prev.date_range, end: e.target.value },
-                        }))
-                      }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                    />
-                  </div>
+            <div className="flex flex-wrap gap-6 items-center">
+              <div className="flex flex-wrap gap-6 items-start">
+                {/* Time Period */}
+                <div className="min-w-[180px]">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Time Period</label>
+                  <select
+                    value={localFilters.graph_type}
+                    onChange={(e) => setLocalFilters((prev) => ({ ...prev, graph_type: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="daily">Daily View</option>
+                    <option value="weekly">Weekly View</option>
+                    <option value="monthly">Monthly View</option>
+                  </select>
                 </div>
-              </div> */}
 
-              {/* Data Settings Group */}
-              <div className="space-y-4">
-                <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wide">Data Settings</h3>
-                <div className="space-y-3">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Time Period</label>
-                    <select
-                      value={localFilters.graph_type}
-                      onChange={(e) => setLocalFilters((prev) => ({ ...prev, graph_type: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                    >
-                      <option value="daily">Daily View</option>
-                      <option value="weekly">Weekly View</option>
-                      <option value="monthly">Monthly View</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Data Type</label>
-                    <select
-                      value={localFilters.data_type}
-                      onChange={(e) => setLocalFilters((prev) => ({ ...prev, data_type: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                    >
-                      <option value="call">Call Data Only</option>
-                      <option value="sms">SMS Data Only</option>
-                      <option value="both">Both Call & SMS</option>
-                    </select>
-                  </div>
+                {/* Data Type */}
+                <div className="min-w-[180px]">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Data Type</label>
+                  <select
+                    value={localFilters.data_type}
+                    onChange={(e) => setLocalFilters((prev) => ({ ...prev, data_type: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="call">Call Data Only</option>
+                    <option value="sms">SMS Data Only</option>
+                    <option value="both">Both Call & SMS</option>
+                  </select>
                 </div>
-              </div>
 
-              {/* Selection Group */}
-              <div className="space-y-4">
-                <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wide">
-                  {viewMode === "company" ? "Company Selection" : "Account Selection"}
-                </h3>
-                <div>
+                {/* Company/Account Selection */}
+                <div className="min-w-[240px]">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     {viewMode === "company" ? "Select Companies" : "Select Accounts"}
                   </label>
@@ -355,58 +314,48 @@ const CallSMSBarChart = ({ viewMode, global_filters }) => {
                         : localFilters.location_ids || []
                     }
                     onChange={(e) => {
-                      const selected = Array.from(e.target.selectedOptions).map((o) => o.value)
+                      const selected = Array.from(e.target.selectedOptions).map((o) => o.value);
                       setLocalFilters((prev) =>
                         viewMode === "company"
                           ? { ...prev, company_ids: selected, location_ids: [] }
                           : { ...prev, location_ids: selected, company_ids: [] }
-                      )
+                      );
                     }}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors h-24"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm h-[48px] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   >
                     {companyAccounts.map((item) => (
                       <option
                         key={viewMode === "company" ? item.company_id : item.location_id}
                         value={viewMode === "company" ? item.company_id : item.location_id}
-                        className="py-1"
                       >
                         {viewMode === "company" ? item.company_name : item.location_name}
                       </option>
                     ))}
                   </select>
-                  <p className="text-xs text-gray-500 mt-1">
-                    Hold Ctrl/Cmd to select multiple items
-                  </p>
+                  <p className="text-xs text-gray-500 mt-1">Hold Ctrl/Cmd to select multiple</p>
                 </div>
               </div>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex items-center gap-4 mt-6 pt-4 border-t border-gray-200">
-              <button
-                onClick={handleApplyFilters}
-                disabled={loading}
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm"
-              >
-                {loading ? (
-                  <div className="flex items-center gap-2">
-                    <RefreshCw className="w-4 h-4 animate-spin" />
-                    Applying...
-                  </div>
-                ) : (
-                  "Apply Filters"
-                )}
-              </button>
-              {/* <button
-                onClick={handleResetFilters}
-                disabled={loading}
-                className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm"
-              >
-                Reset
-              </button> */}
+              {/* Apply Button */}
+              <div className="min-w-[150px] ">
+                <button
+                  onClick={handleApplyFilters}
+                  disabled={loading}
+                  className="w-full px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm"
+                >
+                  {loading ? (
+                    <div className="flex items-center justify-center gap-2">
+                      <RefreshCw className="w-4 h-4 animate-spin" />
+                      Applying...
+                    </div>
+                  ) : (
+                    "Apply Filters"
+                  )}
+                </button>
+              </div>
             </div>
           </div>
         )}
+
 
         {/* Chart Content */}
         <div className="p-6">

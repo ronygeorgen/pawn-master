@@ -1,26 +1,57 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, Filter } from 'lucide-react';
-import Button from './Button';
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Autocomplete,
+  Button,
+  IconButton,
+  Box,
+  Typography,
+  Grid,
+  Paper,
+  Chip,
+  CircularProgress,
+  Divider,
+  Stack,
+  useTheme,
+  alpha
+} from '@mui/material';
+import {
+  Close as CloseIcon,
+  FilterList as FilterIcon,
+  CalendarToday as CalendarIcon,
+  Business as BusinessIcon,
+  Category as CategoryIcon,
+  Refresh as RefreshIcon
+} from '@mui/icons-material';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { apiService } from '../../services/api';
 import { useSelector } from 'react-redux';
 
 const getDefaultDateRange = () => {
+
     const today = new Date();
     const pastDate = new Date();
     pastDate.setFullYear(today.getFullYear() - 1);
 
-    const format = (date) => date.toISOString().split("T")[0];
-
-    return {
-      start: format(pastDate),
-      end: format(today),
-    };
+  return {
+    start: pastDate,
+    end: today,
   };
+};
 
 const FilterModal = ({ isOpen, onClose, filters, onApplyFilters, onResetFilters, onCompanySelected }) => {
+  const theme = useTheme();
+  
   const [localFilters, setLocalFilters] = useState(() => {
-    const start = filters?.dateRange?.start || getDefaultDateRange().start;
-    const end = filters?.dateRange?.end || getDefaultDateRange().end;
+    const defaultRange = getDefaultDateRange();
+    const start = filters?.dateRange?.start ? new Date(filters.dateRange.start) : defaultRange.start;
+    const end = filters?.dateRange?.end ? new Date(filters.dateRange.end) : defaultRange.end;
 
     return {
       company: filters?.company || { id: null, company_name: '' },
@@ -30,113 +61,88 @@ const FilterModal = ({ isOpen, onClose, filters, onApplyFilters, onResetFilters,
   });
 
   const [categorySuggestions, setCategorySuggestions] = useState([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
   const [companySuggestions, setCompanySuggestions] = useState([]);
-  const [showCompanySuggestions, setShowCompanySuggestions] = useState(false);
-  const suggestionsRef = useRef();
 
   const { viewMode } = useSelector(state => state.userData);
+  const [categoryLoading, setCategoryLoading] = useState(false);
+  const [companyLoading, setCompanyLoading] = useState(false);
+  const [categoryInputValue, setCategoryInputValue] = useState('');
+  const [companyInputValue, setCompanyInputValue] = useState('');
 
   useEffect(() => {
-    const start = filters?.dateRange?.start || getDefaultDateRange().start;
-    const end = filters?.dateRange?.end || getDefaultDateRange().end;
+    const defaultRange = getDefaultDateRange();
+    const start = filters?.dateRange?.start ? new Date(filters.dateRange.start) : defaultRange.start;
+    const end = filters?.dateRange?.end ? new Date(filters.dateRange.end) : defaultRange.end;
+    
+
 
     setLocalFilters({
       company: filters?.company || { id: null, company_name: '' },
       category: filters?.category || { id: null, category_name: '' },
       dateRange: { start, end },
     });
+    
+    setCategoryInputValue(filters?.category?.category_name || '');
+    setCompanyInputValue(filters?.company?.company_name || '');
   }, [filters]);
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (suggestionsRef.current && !suggestionsRef.current.contains(event.target)) {
-        setShowSuggestions(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+    // fetchCompanySuggestions("")
+    fetchCategorySuggestions("")
+  },[])
 
-  const handleFilterChange = (field, value) => {
-  if (field === 'category') {
-    // Reset category id until selected
-    setLocalFilters(prev => ({
-      ...prev,
-      category: {...prev.category, id:null, category_name:value},  // reset category ID
-    }));
-
-    if (value.length > 1) {
-      fetchCategorySuggestions(value);
-      setShowSuggestions(true);
-    } else {
-      setCategorySuggestions([]);
-      setShowSuggestions(false);
-    }
-  }else if (field === 'company') {
-    setLocalFilters(prev => ({
-      ...prev,
-      company: { id: null, company_name: value },
-    }));
-
-    if (value.length > 0) {
-      fetchCompanySuggestions(value);
-      setShowCompanySuggestions(true);
-    } else {
+  const fetchCompanySuggestions = async (term) => {
+    // if (!term || term.length < 2) return;
+    
+    setCompanyLoading(true);
+    try {
+      const res = await apiService.get(`/accounts/ghl-auth/?search=${term}`);
+      setCompanySuggestions(res.results || []);
+    } catch (err) {
+      console.error('Failed to fetch company suggestions', err);
       setCompanySuggestions([]);
-      setShowCompanySuggestions(false);
+    } finally {
+      setCompanyLoading(false);
     }
-  } else {
-    setLocalFilters(prev => ({
-      ...prev,
-      [field]: value,
-    }));
-  }
-};
-
-const fetchCompanySuggestions = async (term) => {
-  try {
-    const res = await apiService.get(`/accounts/ghl-auth/?search=${term}`);
-    setCompanySuggestions(res.results || []);
-  } catch (err) {
-    console.error('Failed to fetch company suggestions', err);
-  }
-};
-
-const handleCompanySuggestionClick = (company) => {
-  console.log(company?.company_id, 'ffee');
-  
-  setLocalFilters(prev => ({
-    ...prev,
-    company: {
-      id: company.company_id,
-      company_name: company.company_name
-    },
-  }));
-  if (viewMode === 'account' && onCompanySelected) {
-    onCompanySelected(company.company_id);
-  }
-  setShowCompanySuggestions(false);
-};
-
+  };
 
   const fetchCategorySuggestions = async (term) => {
+    // if (!term || term.length < 2) return;
+    
+    setCategoryLoading(true);
     try {
       const res = await apiService.get(`/category/categories?search=${term}&is_active=true`);
       setCategorySuggestions(res.results || []);
     } catch (err) {
-      console.error('Failed to fetch suggestions', err);
+      console.error('Failed to fetch category suggestions', err);
+      setCategorySuggestions([]);
+    } finally {
+      setCategoryLoading(false);
     }
   };
 
-  const handleSuggestionClick = (category) => {
+  const handleCompanyChange = (event, newValue) => {
     setLocalFilters(prev => ({
       ...prev,
-      category: {id:category?.id, category_name:category?.category_name},  // only ID in filter
+      company: newValue ? {
+        id: newValue.company_id,
+        company_name: newValue.company_name
+      } : { id: null, company_name: '' }
     }));
-    setShowSuggestions(false);
+    if (viewMode === 'account' && onCompanySelected && newValue) {
+      onCompanySelected(newValue.company_id);
+    }
   };
 
+  const handleCategoryChange = (event, newValue) => {
+    setLocalFilters(prev => ({
+      ...prev,
+      category: newValue ? {
+        id: newValue.id,
+        category_name: newValue.category_name
+      } : { id: null, category_name: '' }
+    }));
+  };
 
   const handleDateRangeChange = (field, value) => {
     setLocalFilters(prev => ({
@@ -149,149 +155,343 @@ const handleCompanySuggestionClick = (company) => {
   };
 
   const handleApply = () => {
-    onApplyFilters(localFilters);
+    const formattedFilters = {
+      ...localFilters,
+      dateRange: {
+        start: localFilters.dateRange.start?.toISOString().split('T')[0] || '',
+        end: localFilters.dateRange.end?.toISOString().split('T')[0] || '',
+      },
+    };
+    onApplyFilters(formattedFilters);
     onClose();
   };
 
   const handleReset = () => {
     const resetData = {
-    company: { id: null, company_name: '' },
-    category: { id: null, category_name: '' },
-    dateRange: { start: '', end: '' },
-  };
+      company: { id: null, company_name: '' },
+      category: { id: null, category_name: '' },
+      dateRange: { start: null, end: null },
+    };
     setLocalFilters(resetData);
+    setCategoryInputValue('');
+    setCompanyInputValue('');
     setCategorySuggestions([]);
-    setShowSuggestions(false);
+    setCompanySuggestions([]);
     onResetFilters();
   };
 
-  if (!isOpen) return null;
-
-  console.log(localFilters, 'filtersss');
-  console.log(companySuggestions, 'suggestions company');
-  
-  
+  const hasActiveFilters = () => {
+    return (
+      localFilters.company.id ||
+      localFilters.category.id ||
+      localFilters.dateRange.start ||
+      localFilters.dateRange.end
+    );
+  };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto">
-      <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-        <div className="fixed inset-0 bg-gray-500 bg-opacity-75" onClick={onClose} />
-        <div className="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl sm:my-8 sm:max-w-lg sm:p-6">
-          <div className="absolute right-0 top-0 hidden pr-4 pt-4 sm:block">
-            <button onClick={onClose} className="text-gray-400 hover:text-gray-500">
-              <X className="h-6 w-6" />
-            </button>
-          </div>
-
-          <div className="mt-3 sm:mt-0 sm:text-left w-full">
-            <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center">
-              <Filter className="w-5 h-5 mr-2 text-blue-600" />
+    <LocalizationProvider dateAdapter={AdapterDateFns}>
+      <Dialog
+        open={isOpen}
+        onClose={onClose}
+        maxWidth="md"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 2,
+            boxShadow: theme.shadows[24],
+          }
+        }}
+      >
+        <DialogTitle
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            pb: 1,
+            background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
+            color: 'white',
+            m: 0,
+          }}
+        >
+          <Stack direction="row" alignItems="center" spacing={1}>
+            <FilterIcon />
+            <Typography variant="h6" fontWeight={600}>
               Filter Data
-            </h3>
+            </Typography>
+          </Stack>
+          <IconButton
+            onClick={onClose}
+            sx={{
+              color: 'white',
+              '&:hover': {
+                backgroundColor: alpha(theme.palette.common.white, 0.1),
+              },
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
 
-            <div className="space-y-4">
-              <div className="relative" ref={suggestionsRef}>
-                <label className="block text-sm font-medium mb-2">Company</label>
-                <input
-                  type="text"
-                  value={localFilters?.company?.company_name || ''}
-                  onChange={(e) => handleFilterChange('company', e.target.value)}
-                  className="w-full border rounded px-3 py-2"
-                  placeholder="Search companies..."
-                  onFocus={() => {
-                    if (
-                      localFilters?.company?.company_name?.length > 1 &&
-                      companySuggestions.length > 0
-                    ) {
-                      setShowCompanySuggestions(true);
-                    }
-                  }}
-                />
-                {showCompanySuggestions && (
-                  <ul className="absolute z-50 bg-white border rounded w-full mt-1 max-h-40 overflow-y-auto shadow-md">
-                    {companySuggestions.length === 0 ? (
-                      <li className="px-4 py-2 text-gray-500">No companies found</li>
-                    ) : (
-                      companySuggestions?.map((c, index) => (
-                        <li
-                          key={index}
-                          onClick={() => handleCompanySuggestionClick(c)}
-                          className="px-4 py-2 hover:bg-blue-100 cursor-pointer"
-                        >
-                          {c.company_name}
-                        </li>
-                      ))
-                    )}
-                  </ul>
+        <DialogContent sx={{ p: 3 }}>
+          <Stack spacing={3} sx={{ mt: 1 }}>
+            {/* Company Filter */}
+            <Paper
+              elevation={0}
+              sx={{
+                p: 2,
+                border: `1px solid ${theme.palette.divider}`,
+                borderRadius: 2,
+                backgroundColor: alpha(theme.palette.primary.main, 0.02),
+              }}
+            >
+              <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
+                <BusinessIcon color="primary" />
+                <Typography variant="subtitle1" fontWeight={600}>
+                  Company
+                </Typography>
+              </Stack>
+              <Autocomplete
+                options={companySuggestions}
+                getOptionLabel={(option) => option.company_name || ''}
+                value={localFilters.company.id ? localFilters.company : null}
+                onChange={handleCompanyChange}
+                inputValue={companyInputValue}
+                onInputChange={(event, newInputValue) => {
+                  setCompanyInputValue(newInputValue);
+                  fetchCompanySuggestions(newInputValue);
+                }}
+                loading={companyLoading}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    placeholder="Search and select a company..."
+                    variant="outlined"
+                    fullWidth
+                    InputProps={{
+                      ...params.InputProps,
+                      endAdornment: (
+                        <>
+                          {companyLoading ? <CircularProgress color="inherit" size={20} /> : null}
+                          {params.InputProps.endAdornment}
+                        </>
+                      ),
+                    }}
+                  />
                 )}
-              </div>
-
-              <div className="relative" ref={suggestionsRef}>
-                <label className="block text-sm font-medium mb-2">Category</label>
-                <input
-                  type="text"
-                  value={localFilters?.category?.category_name}
-                  onChange={(e) => handleFilterChange('category', e.target.value)}
-                  className="w-full border rounded px-3 py-2"
-                  placeholder="Search categories..."
-                  onFocus={() => {
-                    if (localFilters?.category?.category_name?.length > 1 && categorySuggestions.length > 0) {
-                      setShowSuggestions(true);
-                    }
-                  }}
-                />
-                {showSuggestions && (
-                  <ul className="absolute z-50 bg-white border rounded w-full mt-1 max-h-40 overflow-y-auto shadow-md">
-                    {categorySuggestions.length === 0 ? (
-                      <li className="px-4 py-2 text-gray-500">No categories found</li>
-                    ) : (
-                      categorySuggestions.map((cat, index) => (
-                        <li
-                          key={index}
-                          onClick={() => handleSuggestionClick(cat)}
-                          className="px-4 py-2 hover:bg-blue-100 cursor-pointer"
-                        >
-                          {cat.category_name}
-                        </li>
-                      ))
-                    )}
-                  </ul>
+                renderOption={(props, option) => (
+                  <Box component="li" {...props} sx={{ py: 1 }}>
+                    <Stack>
+                      <Typography variant="body2" fontWeight={500}>
+                        {option.company_name}
+                      </Typography>
+                      {option.company_id && (
+                        <Typography variant="caption" color="text.secondary">
+                          ID: {option.company_id}
+                        </Typography>
+                      )}
+                    </Stack>
+                  </Box>
                 )}
-              </div>
+                noOptionsText="No companies found"
+              />
+            </Paper>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm mb-2">Start Date</label>
-                  <input
-                    type="date"
+            {/* Category Filter */}
+            <Paper
+              elevation={0}
+              sx={{
+                p: 2,
+                border: `1px solid ${theme.palette.divider}`,
+                borderRadius: 2,
+                backgroundColor: alpha(theme.palette.secondary.main, 0.02),
+              }}
+            >
+              <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
+                <CategoryIcon color="secondary" />
+                <Typography variant="subtitle1" fontWeight={600}>
+                  Category
+                </Typography>
+              </Stack>
+              <Autocomplete
+                options={categorySuggestions}
+                getOptionLabel={(option) => option.category_name || ''}
+                value={localFilters.category.id ? localFilters.category : null}
+                onChange={handleCategoryChange}
+                inputValue={categoryInputValue}
+                onInputChange={(event, newInputValue) => {
+                  setCategoryInputValue(newInputValue);
+                  fetchCategorySuggestions(newInputValue);
+                }}
+                loading={categoryLoading}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    placeholder="Search and select a category..."
+                    variant="outlined"
+                    fullWidth
+                    InputProps={{
+                      ...params.InputProps,
+                      endAdornment: (
+                        <>
+                          {categoryLoading ? <CircularProgress color="inherit" size={20} /> : null}
+                          {params.InputProps.endAdornment}
+                        </>
+                      ),
+                    }}
+                  />
+                )}
+                renderOption={(props, option) => (
+                  <Box component="li" {...props} sx={{ py: 1 }}>
+                    <Stack>
+                      <Typography variant="body2" fontWeight={500}>
+                        {option.category_name}
+                      </Typography>
+                      {option.id && (
+                        <Typography variant="caption" color="text.secondary">
+                          ID: {option.id}
+                        </Typography>
+                      )}
+                    </Stack>
+                  </Box>
+                )}
+                noOptionsText="No categories found"
+              />
+            </Paper>
+
+            {/* Date Range Filter */}
+            <Paper
+              elevation={0}
+              sx={{
+                p: 2,
+                border: `1px solid ${theme.palette.divider}`,
+                borderRadius: 2,
+                backgroundColor: alpha(theme.palette.info.main, 0.02),
+              }}
+            >
+              <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
+                <CalendarIcon color="info" />
+                <Typography variant="subtitle1" fontWeight={600}>
+                  Date Range
+                </Typography>
+              </Stack>
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={6}>
+                  <DatePicker
+                    label="Start Date"
                     value={localFilters.dateRange.start}
-                    onChange={(e) => handleDateRangeChange('start', e.target.value)}
-                    className="w-full border rounded px-3 py-2"
+                    onChange={(value) => handleDateRangeChange('start', value)}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        fullWidth
+                        variant="outlined"
+                      />
+                    )}
+                    maxDate={localFilters.dateRange.end || new Date()}
                   />
-                </div>
-                <div>
-                  <label className="block text-sm mb-2">End Date</label>
-                  <input
-                    type="date"
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <DatePicker
+                    label="End Date"
                     value={localFilters.dateRange.end}
-                    onChange={(e) => handleDateRangeChange('end', e.target.value)}
-                    className="w-full border rounded px-3 py-2"
+                    onChange={(value) => handleDateRangeChange('end', value)}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        fullWidth
+                        variant="outlined"
+                      />
+                    )}
+                    minDate={localFilters.dateRange.start}
+                    maxDate={new Date()}
                   />
-                </div>
-              </div>
-            </div>
+                </Grid>
+              </Grid>
+            </Paper>
 
-            <div className="flex justify-between pt-6">
-              <Button variant="outline" onClick={handleReset}>Reset Filters</Button>
-              <div className="flex space-x-3">
-                <Button variant="outline" onClick={onClose}>Cancel</Button>
-                <Button onClick={handleApply}>Apply Filters</Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+            {/* Active Filters Summary */}
+            {hasActiveFilters() && (
+              <Paper
+                elevation={0}
+                sx={{
+                  p: 2,
+                  border: `1px solid ${theme.palette.success.main}`,
+                  borderRadius: 2,
+                  backgroundColor: alpha(theme.palette.success.main, 0.05),
+                }}
+              >
+                <Typography variant="subtitle2" color="success.main" gutterBottom>
+                  Active Filters
+                </Typography>
+                <Stack direction="row" spacing={1} flexWrap="wrap" gap={1}>
+                  {localFilters.company.id && (
+                    <Chip
+                      label={`Company: ${localFilters.company.company_name}`}
+                      color="primary"
+                      variant="outlined"
+                      size="small"
+                    />
+                  )}
+                  {localFilters.category.id && (
+                    <Chip
+                      label={`Category: ${localFilters.category.category_name}`}
+                      color="secondary"
+                      variant="outlined"
+                      size="small"
+                    />
+                  )}
+                  {localFilters.dateRange.start && (
+                    <Chip
+                      label={`From: ${localFilters.dateRange.start.toLocaleDateString()}`}
+                      color="info"
+                      variant="outlined"
+                      size="small"
+                    />
+                  )}
+                  {localFilters.dateRange.end && (
+                    <Chip
+                      label={`To: ${localFilters.dateRange.end.toLocaleDateString()}`}
+                      color="info"
+                      variant="outlined"
+                      size="small"
+                    />
+                  )}
+                </Stack>
+              </Paper>
+            )}
+          </Stack>
+        </DialogContent>
+
+        <Divider />
+
+        <DialogActions sx={{ p: 3, gap: 1 }}>
+          <Button
+            onClick={handleReset}
+            variant="outlined"
+            startIcon={<RefreshIcon />}
+            sx={{ minWidth: 120 }}
+          >
+            Reset Filters
+          </Button>
+          <Box sx={{ flex: 1 }} />
+          <Button
+            onClick={onClose}
+            variant="outlined"
+            sx={{ minWidth: 80 }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleApply}
+            variant="contained"
+            sx={{ minWidth: 120 }}
+          >
+            Apply Filters
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </LocalizationProvider>
   );
 };
 

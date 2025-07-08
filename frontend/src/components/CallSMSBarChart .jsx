@@ -49,57 +49,65 @@ const CallSMSBarChart = ({ viewMode }) => {
   }, [dispatch, viewMode])
 
   const chartData = useMemo(() => {
-    if (!data?.data || !Array.isArray(data.data)) return []
+  if (!data?.data || !Array.isArray(data.data)) return []
 
-    return data.data
-      .map((item) => {
-        const date = new Date(item.period_date)
+  const groupedData = {}
 
-        if (isNaN(date.getTime())) {
-          console.warn("Invalid date:", item.period_date)
-          return null
-        }
+  data.data.forEach((item) => {
+    const date = new Date(item.period_date)
+    if (isNaN(date.getTime())) return
 
-        let label = ""
-        if (appliedFilters.graph_type === "daily") {
-          label = date.toLocaleDateString("en-IN")
-        } else if (appliedFilters.graph_type === "weekly") {
-          const weekNumber = Math.ceil(date.getDate() / 7)
-          label = `Week ${weekNumber} - ${date.toLocaleDateString("en-US", {
-            month: "short",
-            year: "numeric",
-          })}`
-        } else {
-          label = date.toLocaleDateString("en-US", {
-            month: "short",
-            year: "numeric",
-          })
-        }
-
-        const base = { label }
-        if (appliedFilters.data_type === "call") {
-          base.total_calls = item.call_data?.total_calls || 0
-        } else if (appliedFilters.data_type === "sms") {
-          base.total_sms = item.sms_data?.total_messages || 0
-          base.inbound_messages = item.sms_data?.inbound_messages || 0
-          base.outbound_messages = item.sms_data?.outbound_messages || 0
-        } else if (appliedFilters.data_type === "both") {
-          base.total_calls = item.call_data?.total_calls || 0
-          base.inbound_calls = item.call_data?.inbound_calls || 0
-          base.outbound_calls = item.call_data?.outbound_calls || 0
-          base.total_duration = item.call_data?.total_duration || 0
-          base.total_usage = item.call_data?.total_usage || 0
-
-          base.total_sms = item.sms_data?.total_messages || 0
-          base.inbound_messages = item.sms_data?.inbound_messages || 0
-          base.outbound_messages = item.sms_data?.outbound_messages || 0
-          base.total_segments = item.sms_data?.total_segments || 0
-        }
-
-        return base
+    let label = ""
+    if (appliedFilters.graph_type === "daily") {
+      label = date.toLocaleDateString("en-IN")
+    } else if (appliedFilters.graph_type === "weekly") {
+      const weekNumber = Math.ceil(date.getDate() / 7)
+      label = `Week ${weekNumber} - ${date.toLocaleDateString("en-US", {
+        month: "short",
+        year: "numeric",
+      })}`
+    } else {
+      label = date.toLocaleDateString("en-US", {
+        month: "short",
+        year: "numeric",
       })
-      .filter(Boolean)
-  }, [data?.data, appliedFilters.data_type, appliedFilters.graph_type])
+    }
+
+    if (!groupedData[label]) {
+      groupedData[label] = {
+        label,
+        total_calls: 0,
+        inbound_calls: 0,
+        outbound_calls: 0,
+        total_duration: 0,
+        total_usage: 0,
+        total_sms: 0,
+        inbound_messages: 0,
+        outbound_messages: 0,
+        total_segments: 0,
+      }
+    }
+
+    const group = groupedData[label]
+
+    if (appliedFilters.data_type === "call" || appliedFilters.data_type === "both") {
+      group.total_calls += item.call_data?.total_calls || 0
+      group.inbound_calls += item.call_data?.inbound_calls || 0
+      group.outbound_calls += item.call_data?.outbound_calls || 0
+      group.total_duration += item.call_data?.total_duration || 0
+      group.total_usage += item.call_data?.total_usage || 0
+    }
+
+    if (appliedFilters.data_type === "sms" || appliedFilters.data_type === "both") {
+      group.total_sms += item.sms_data?.total_messages || 0
+      group.inbound_messages += item.sms_data?.inbound_messages || 0
+      group.outbound_messages += item.sms_data?.outbound_messages || 0
+      group.total_segments += item.sms_data?.total_segments || 0
+    }
+  })
+
+  return Object.values(groupedData)
+}, [data?.data, appliedFilters])
 
   const colors = {
     total_calls: "#10b981",

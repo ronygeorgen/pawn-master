@@ -87,7 +87,7 @@ const FilterModal = ({ isOpen, onClose, filters, onApplyFilters, onResetFilters,
   }, [filters]);
 
   useEffect(() => {
-    // fetchCompanySuggestions("")
+    fetchCompanySuggestions("")
     fetchCategorySuggestions("")
     fetchCompanySuggestions("")
   },[])

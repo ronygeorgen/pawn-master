@@ -3,6 +3,10 @@ import { userDataService } from '../../services/userDataService';
 
 const initialState = {
   data: [],
+  count: 0,
+  next: null,
+  previous: null,
+  currentPage: 1,
   filters: {
     company: '',
     category: '',
@@ -17,10 +21,10 @@ const initialState = {
 
 export const fetchUserData = createAsyncThunk(
   'userData/fetchData',
-  async ({ filters, viewMode }) => {
+  async ({ filters, viewMode, page = 1 }) => {
     console.log(filters, viewMode, 'from slice acrtion');
     
-    return await userDataService.getUserData(filters, viewMode);
+    return await userDataService.getUserData(filters, viewMode, page);
   }
 );
 
@@ -74,8 +78,13 @@ const userDataSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchUserData.fulfilled, (state, action) => {
+        console.log(action.payload, 'data')
         state.loading = false;
-        state.data = action.payload;
+        state.data = action.payload.data;
+        state.count = action.payload.count;
+        state.next = action.payload.next;
+        state.previous = action.payload.previous;
+        state.currentPage = action.meta.arg.page || 1;
       })
       .addCase(fetchUserData.rejected, (state, action) => {
         state.loading = false;

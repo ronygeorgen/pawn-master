@@ -2,7 +2,7 @@ import { apiService } from './api';
 import { mockUserData } from '../data/mockData';
 
 class UserDataService {
-  async getUserData(filters, viewMode) {
+  async getUserData(filters, viewMode, page = 1) {
     try {
       console.log("Fetching real data with filters:", filters, viewMode);
 
@@ -39,8 +39,9 @@ class UserDataService {
 
       console.log('Payload being sent:', payload);
 
-      const response = await apiService.post('/accounts/analytics/usage-analytics/', payload);
-      const rawData = response.data || [];
+      const response = await apiService.post(`/accounts/analytics/usage-analytics/?page=${page}`, payload);
+      console.log(response, 'response')
+      const rawData = response || [];
 
       console.log("API Response:", response);
       console.log("Raw data received:", rawData);

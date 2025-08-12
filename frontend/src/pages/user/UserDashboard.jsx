@@ -19,7 +19,7 @@ import CallSMSBarChart from '../../components/CallSMSBarChart ';
 
 const UserDashboard = () => {
   const dispatch = useDispatch();
-  const { data, filters, viewMode, loading, error, success, refreshCallSuccess } = useSelector(
+  const { data, filters, viewMode, loading, error, success, refreshCallSuccess, count, next, previous, currentPage } = useSelector(
     state => state.userData
   );
   
@@ -395,6 +395,28 @@ const UserDashboard = () => {
                     ))}
                   </tbody>
                 </table>
+                <div className="flex justify-between items-center mt-4">
+  <button
+    disabled={!previous}
+    onClick={() => dispatch(fetchUserData({ filters, viewMode, page: currentPage - 1 }))}
+    className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
+  >
+    Previous
+  </button>
+
+  <span>
+    Page {currentPage} of {Math.ceil(count / 10)}
+  </span>
+
+  <button
+    disabled={!next}
+    onClick={() => dispatch(fetchUserData({ filters, viewMode, page: currentPage + 1 }))}
+    className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
+  >
+    Next
+  </button>
+</div>
+
               </div>
             </div>
           )}

@@ -1,59 +1,65 @@
-import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { Users, MapPin, DollarSign, Edit2, Plus } from 'lucide-react';
-import { fetchSMSGroup, fetchSMSGroups, updateSMSGroup } from '../../store/slices/smsGroupsSlice';
-import Button from '../../components/common/Button';
-import Shimmer from '../../components/common/Shimmer';
-import { useSMSGroups } from '../../hooks/useSMSGroups';
-import { useSearchParams } from 'react-router-dom';
-import EditSMSGroupModal from '../../components/admin/EditSMSGroupModal';
+"use client"
+
+import { useEffect, useState } from "react"
+import { useDispatch, useSelector } from "react-redux"
+import { Users, MapPin, DollarSign, Edit2, Plus } from "lucide-react"
+import { fetchSMSGroup, updateSMSGroup } from "../../store/slices/smsGroupsSlice"
+import Button from "../../components/common/Button"
+import Shimmer from "../../components/common/Shimmer"
+import Pagination from "../../components/common/Pagination"
+import { useSMSGroups } from "../../hooks/useSMSGroups"
+import { useSearchParams } from "react-router-dom"
+import EditSMSGroupModal from "../../components/admin/EditSMSGroupModal"
 
 const SMSGroupsPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedSMSGroup, setSelectedSMSGroup] = useState(null)
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
-  
-  const dispatch = useDispatch();
-  const { smsGroups, selectedsmsGroup, loading, selectsmsGroup, success } = useSMSGroups();  
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api"
+  const dispatch = useDispatch()
 
-  // const {smsGroups, selectedsmsGroup, loading, selectsmsGroup} = useSelector(state=>state.smsGroups)
+  // Get pagination data from the custom hook
+  const { smsGroups, selectedsmsGroup, loading, selectsmsGroup, success, goToNextPage, goToPreviousPage, currentPage } =
+    useSMSGroups()
 
-  const [searchParams] = useSearchParams();
-  const location_id = searchParams.get('location_id');
+  // Get pagination info from Redux store
+  const { next, previous, count } = useSelector((state) => state.smsGroups)
 
-  console.log(location_id, 'location_id from params', smsGroups);
+  const [searchParams] = useSearchParams()
+  const location_id = searchParams.get("location_id")
 
-  useEffect(()=>{
-    if (location_id){
-      dispatch(fetchSMSGroup(location_id));
+  console.log(location_id, "location_id from params", smsGroups)
+  console.log("Pagination info:", { next, previous, currentPage, count })
+
+  useEffect(() => {
+    if (location_id) {
+      dispatch(fetchSMSGroup(location_id))
     }
-  },[])
+  }, [location_id, dispatch])
 
-  console.log(success, 'ls');
-  
+  console.log(success, "ls")
 
-  useEffect(()=>{
-    if(success){
-      handleEditClick(selectedsmsGroup);
+  useEffect(() => {
+    if (success) {
+      handleEditClick(selectedsmsGroup)
     }
-  })
-
-  // useEffect(() => {
-  //   dispatch(fetchSMSGroups());
-  // }, [dispatch]);
+  }, [success, selectedsmsGroup])
 
   const handleStatusToggle = async (location_id, is_approved) => {
-    console.log(location_id, is_approved);
-    
-      try {
-        dispatch(updateSMSGroup({location_id, data:{'is_approved': !is_approved}} ));
-      } catch (error) {
-        console.error('Failed to update SMS group status:', error);
-      }
-  };
+    console.log(location_id, is_approved)
+    try {
+      dispatch(
+        updateSMSGroup({
+          location_id,
+          data: { is_approved: !is_approved },
+        }),
+      )
+    } catch (error) {
+      console.error("Failed to update SMS group status:", error)
+    }
+  }
 
-  const handleOnboard = ()=>{
-    window.location.href = `${API_BASE_URL}core/auth/connect/`;
+  const handleOnboard = () => {
+    window.location.href = `${API_BASE_URL}core/auth/connect/`
   }
 
   const handleEditClick = (smsGroup) => {
@@ -80,16 +86,15 @@ const SMSGroupsPage = () => {
     }
   }
 
-  console.log(selectedSMSGroup, 'ldd');
-  
+  console.log(selectedSMSGroup, "ldd")
 
   if (loading) {
     return (
       <div className="space-y-6">
         <div className="bg-white shadow rounded-lg">
           <div className="px-6 py-4 border-b border-gray-200">
-            <Shimmer width="w-32\" height="h-6\" className="mb-2" />
-            <Shimmer width="w-96\" height="h-4" />
+            <Shimmer width="w-32" height="h-6" className="mb-2" />
+            <Shimmer width="w-96" height="h-4" />
           </div>
           <div className="p-6">
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -118,46 +123,57 @@ const SMSGroupsPage = () => {
           </div>
         </div>
       </div>
-    );
+    )
   }
 
   return (
     <div className="">
       <div className="bg-white shadow rounded-lg">
         <div className="px-6 py-4 border-b border-gray-200 flex flex-row justify-between">
-          <div className=''>
+          <div className="">
             <h3 className="text-lg font-medium text-gray-900 flex items-center">
               <Users className="w-5 h-5 mr-2 text-purple-600" />
               SMS Groups
             </h3>
-            <p className="text-sm text-gray-600 mt-1">
-              Manage your onboarded locations and their SMS settings
-            </p>
+            <p className="text-sm text-gray-600 mt-1">Manage your onboarded locations and their SMS settings</p>
           </div>
-          <Button className='gap-0.5' onClick={handleOnboard}>
+          <Button className="gap-0.5" onClick={handleOnboard}>
             <Plus />
             Add Onboard Location
           </Button>
         </div>
-        
+
         <div className="p-6">
+          {/* Show current page info */}
+          <div className="mb-4 text-sm text-gray-600">
+            {count && (
+              <p>
+                Showing page {currentPage}
+                {count && ` of ${Math.ceil(count / 10)} total pages (${count} items)`}
+              </p>
+            )}
+          </div>
+
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {smsGroups?.map((smsGroup) => (
-              <div key={smsGroup?.id} className="border border-gray-200 rounded-lg p-6 hover:border-gray-300 transition-colors">
+              <div
+                key={smsGroup?.id}
+                className="border border-gray-200 rounded-lg p-6 hover:border-gray-300 transition-colors"
+              >
                 <div className="flex items-center justify-between mb-4">
                   <h4 className="font-semibold text-gray-900 flex items-center">
                     <Users className="w-5 h-5 mr-2 text-purple-600" />
                     {smsGroup?.location_name}
                   </h4>
-                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                    smsGroup?.is_approved 
-                      ? 'bg-green-100 text-green-800' 
-                      : 'bg-gray-100 text-gray-800'
-                  }`}>
-                    {smsGroup?.is_approved ? 'active' : 'inactive'}
+                  <span
+                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                      smsGroup?.is_approved ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
+                    }`}
+                  >
+                    {smsGroup?.is_approved ? "active" : "inactive"}
                   </span>
                 </div>
-                
+
                 <div className="space-y-2 mb-4">
                   <p className="text-sm text-gray-600 flex items-center">
                     <MapPin className="w-4 h-4 mr-2" />
@@ -167,7 +183,7 @@ const SMSGroupsPage = () => {
                     {smsGroup?.category?.category_name}
                   </span>
                 </div>
-                
+
                 <div className="grid grid-cols-2 gap-4 mb-4">
                   <div>
                     <p className="text-xs text-gray-500">Inbound SMS Rate</p>
@@ -207,29 +223,61 @@ const SMSGroupsPage = () => {
                     <p className="text-xs text-gray-500">Call Price Ratio</p>
                     <p className="text-sm font-semibold text-green-600 flex items-center">
                       <DollarSign className="w-3 h-3" />
-                      {smsGroup?.call_price_ratio? smsGroup?.call_price_ratio: 'null'}
+                      {smsGroup?.call_price_ratio ? smsGroup?.call_price_ratio : "null"}
                     </p>
                   </div>
                 </div>
-                
+
                 <div className="flex space-x-2">
                   <Button
                     onClick={() => handleStatusToggle(smsGroup?.location_id, smsGroup?.is_approved)}
-                    variant={smsGroup?.is_approved ? 'danger' : 'success'}
+                    variant={smsGroup?.is_approved ? "danger" : "success"}
                     size="sm"
                     className="flex-1"
                   >
-                    {smsGroup?.is_approved ? 'Deactivate' : 'Activate'}
+                    {smsGroup?.is_approved ? "Deactivate" : "Activate"}
                   </Button>
-                  <button className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" onClick={() => handleEditClick(smsGroup)}> 
+                  <button
+                    className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                    onClick={() => handleEditClick(smsGroup)}
+                  >
                     <Edit2 className="w-4 h-4" />
                   </button>
                 </div>
               </div>
             ))}
           </div>
+
+          {/* Show message when no data */}
+          {!loading && (!smsGroups || smsGroups.length === 0) && (
+            <div className="text-center py-12">
+              <Users className="mx-auto h-12 w-12 text-gray-400" />
+              <h3 className="mt-2 text-sm font-medium text-gray-900">No SMS Groups</h3>
+              <p className="mt-1 text-sm text-gray-500">Get started by onboarding your first location.</p>
+              <div className="mt-6">
+                <Button onClick={handleOnboard}>
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Onboard Location
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
+
+        {/* Pagination Component */}
+        {smsGroups && smsGroups.length > 0 && (
+          <Pagination
+            currentPage={currentPage}
+            hasNext={!!next}
+            hasPrevious={!!previous}
+            onNextPage={goToNextPage}
+            onPreviousPage={goToPreviousPage}
+            totalItems={count}
+            itemsPerPage={10}
+          />
+        )}
       </div>
+
       <EditSMSGroupModal
         isOpen={isModalOpen}
         onClose={handleModalClose}
@@ -238,7 +286,7 @@ const SMSGroupsPage = () => {
         loading={loading}
       />
     </div>
-  );
-};
+  )
+}
 
-export default SMSGroupsPage;
+export default SMSGroupsPage

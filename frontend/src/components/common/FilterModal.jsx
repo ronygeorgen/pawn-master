@@ -69,6 +69,8 @@ const FilterModal = ({ isOpen, onClose, filters, onApplyFilters, onResetFilters,
   const [categoryInputValue, setCategoryInputValue] = useState('');
   const [companyInputValue, setCompanyInputValue] = useState('');
 
+  console.log('Initial filters in modal:', localFilters);
+
   useEffect(() => {
     const defaultRange = getDefaultDateRange();
     const start = filters?.dateRange?.start ? new Date(filters.dateRange.start) : defaultRange.start;
@@ -158,6 +160,20 @@ const FilterModal = ({ isOpen, onClose, filters, onApplyFilters, onResetFilters,
     }));
   };
 
+  const toUTCEndOfDay = (date) => {
+    if (!date) return null;
+    const d = new Date(date);
+    d.setHours(23, 59, 59, 999);
+    return d.toISOString();
+  };
+
+  const toUTCStartOfDay = (date) => {
+    if (!date) return null;
+    const d = new Date(date);
+    d.setHours(0, 0, 0, 0);
+    return d.toISOString();
+  };
+
   const handleDateRangeChange = (field, value) => {
     setLocalFilters(prev => ({
       ...prev,
@@ -172,8 +188,8 @@ const FilterModal = ({ isOpen, onClose, filters, onApplyFilters, onResetFilters,
     const formattedFilters = {
       ...localFilters,
       dateRange: {
-        start: localFilters.dateRange.start?.toISOString().split('T')[0] || '',
-        end: localFilters.dateRange.end?.toISOString().split('T')[0] || '',
+        start: toUTCStartOfDay(localFilters.dateRange.start),
+        end: toUTCEndOfDay(localFilters.dateRange.end),
       },
     };
     onApplyFilters(formattedFilters);

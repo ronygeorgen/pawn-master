@@ -2,7 +2,7 @@ import { apiService } from './api';
 import { mockUserData } from '../data/mockData';
 
 class UserDataService {
-  async getUserData(filters, viewMode, page = 1) {
+  async getUserData(filters, viewMode, page = 1, search) {
     try {
       console.log("Fetching real data with filters:", filters, viewMode);
 
@@ -35,6 +35,7 @@ class UserDataService {
         ...(filters?.category?.id && { category: Number(filters.category.id) }),
         // Fix company handling - ensure company_id is used correctly
         ...(filters?.company?.id && { company_id: filters.company.id }),
+        ...(search && { search }),
       };
 
       console.log('Payload being sent:', payload);

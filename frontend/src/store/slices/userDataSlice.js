@@ -21,10 +21,10 @@ const initialState = {
 
 export const fetchUserData = createAsyncThunk(
   'userData/fetchData',
-  async ({ filters, viewMode, page = 1 }) => {
+  async ({ filters, viewMode, page = 1, search = '' }) => {
     console.log(filters, viewMode, 'from slice acrtion');
     
-    return await userDataService.getUserData(filters, viewMode, page);
+    return await userDataService.getUserData(filters, viewMode, page, search);
   }
 );
 

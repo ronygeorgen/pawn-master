@@ -28,6 +28,8 @@ const UserDashboard = () => {
   const [refreshingWallet, setRefreshingWallet] = useState(null);
   const [refreshingCall, setRefreshingCall] = useState(null);
 
+  const [searchTerm, setSearchTerm] = useState('');
+
   useEffect(()=>{
     if (success){
       toast.success('Wallet refreshed!', {
@@ -52,6 +54,10 @@ const UserDashboard = () => {
   useEffect(() => {
     dispatch(fetchUserData({ filters, viewMode }));
   }, [dispatch, filters, viewMode]);
+
+  const handleSearch = () => {
+    dispatch(fetchUserData({ filters, viewMode, page: 1, search: searchTerm.trim() }));
+  };
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-US', {
@@ -232,6 +238,23 @@ const UserDashboard = () => {
               : 'View detailed SMS usage data by location and company'
             }
           </p>
+          {/* ✅ Search Input */}
+          <div className="mt-4 flex items-center gap-2">
+            <input
+              type="text"
+              placeholder="Search location Id or location name..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+              className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <button
+              onClick={handleSearch}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm"
+            >
+              Search
+            </button>
+          </div>
         </div>
         
         <div className="p-6">

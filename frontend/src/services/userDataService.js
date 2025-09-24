@@ -13,14 +13,17 @@ class UserDataService {
       }
 
       // Ensure ISO string format (e.g., 2025-06-01T00:00:00Z)
-      const formatToISO = (dateStr, fallbackDate) => {
+      const formatToYMD = (dateStr, fallbackDate) => {
         const date = dateStr ? new Date(dateStr) : fallbackDate;
-        return date.toISOString();
+        const year = date.getUTCFullYear();
+        const month = String(date.getUTCMonth() + 1).padStart(2, '0'); // 0-indexed months
+        const day = String(date.getUTCDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
       };
       
       const now = new Date();
       const fiveYearsAgo = new Date();
-      fiveYearsAgo.setFullYear(now.getFullYear() - 5);
+      fiveYearsAgo.setFullYear(now.getFullYear() - 1);
 
       console.log('Filters from service:', filters);
       console.log('ViewMode from service:', viewMode);
@@ -28,8 +31,8 @@ class UserDataService {
       const payload = {
         view_type: viewMode,
         date_range: {
-          start: formatToISO(filters?.dateRange?.start, fiveYearsAgo),
-          end: formatToISO(filters?.dateRange?.end, now),
+          start: formatToYMD(filters?.dateRange?.start, fiveYearsAgo),
+          end: formatToYMD(filters?.dateRange?.end, now),
         },
         // Fix category handling - check for both id and category_name
         ...(filters?.category?.id && { category: Number(filters.category.id) }),

@@ -160,18 +160,13 @@ const FilterModal = ({ isOpen, onClose, filters, onApplyFilters, onResetFilters,
     }));
   };
 
-  const toUTCEndOfDay = (date) => {
+  const formatDate = (date) => {
     if (!date) return null;
     const d = new Date(date);
-    d.setHours(23, 59, 59, 999);
-    return d.toISOString();
-  };
-
-  const toUTCStartOfDay = (date) => {
-    if (!date) return null;
-    const d = new Date(date);
-    d.setHours(0, 0, 0, 0);
-    return d.toISOString();
+    const year = d.getUTCFullYear();
+    const month = String(d.getUTCMonth() + 1).padStart(2, '0'); // months are 0-indexed
+    const day = String(d.getUTCDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   };
 
   const handleDateRangeChange = (field, value) => {
@@ -185,11 +180,13 @@ const FilterModal = ({ isOpen, onClose, filters, onApplyFilters, onResetFilters,
   };
 
   const handleApply = () => {
+    console.log(formatDate(localFilters.dateRange.start), 'formatted start date');
+    console.log(formatDate(localFilters.dateRange.end), 'formatted end date');
     const formattedFilters = {
       ...localFilters,
       dateRange: {
-        start: toUTCStartOfDay(localFilters.dateRange.start),
-        end: toUTCEndOfDay(localFilters.dateRange.end),
+        start: formatDate(localFilters.dateRange.start),
+        end: formatDate(localFilters.dateRange.end),
       },
     };
     onApplyFilters(formattedFilters);

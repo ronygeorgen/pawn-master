@@ -80,7 +80,7 @@ const userDataSlice = createSlice({
       .addCase(fetchUserData.fulfilled, (state, action) => {
         console.log(action.payload, 'data')
         state.loading = false;
-        state.data = action.payload.data;
+        state.data = action.payload.results;
         state.count = action.payload.count;
         state.next = action.payload.next;
         state.previous = action.payload.previous;

@@ -109,7 +109,7 @@ const UserDashboard = () => {
     <div className="bg-blue-50 p-4 rounded-lg">
       <h4 className="font-medium text-blue-900 mb-3">SMS Data Details</h4>
       <div className="flex justify-between text-sm">
-        <div className='flex flex-col gap-2'>
+        {/* <div className='flex flex-col gap-2'>
           <div>
             <span className="text-gray-600">Inbound Segments:</span>
             <div className="font-medium">{item.sms_data?.total_inbound_segments || 0}</div>
@@ -118,7 +118,7 @@ const UserDashboard = () => {
             <span className="text-gray-600">Outbound Segments:</span>
             <div className="font-medium">{item.sms_data?.total_outbound_segments || 0}</div>
           </div>
-        </div>
+        </div> */}
         <div className='flex flex-col gap-2'>
           <div>
             <span className="text-gray-600">Messages In:</span>
@@ -141,7 +141,7 @@ const UserDashboard = () => {
         </div>
         {viewMode === 'account' && (
           <>
-            <div className='flex flex-col gap-2'>
+            {/* <div className='flex flex-col gap-2'>
               <div>
                 <span className="text-gray-600">Inbound Rate:</span>
                 <div className="font-medium">{formatCurrency(item.sms_data?.sms_inbound_rate || 0)}</div>
@@ -150,7 +150,7 @@ const UserDashboard = () => {
                 <span className="text-gray-600">Outbound Rate:</span>
                 <div className="font-medium">{formatCurrency(item.sms_data?.sms_outbound_rate || 0)}</div>
               </div>
-            </div>
+            </div> */}
           </>
         )}
       </div>
@@ -174,11 +174,11 @@ const UserDashboard = () => {
         <div className='flex flex-col gap-2'>
           <div>
             <span className="text-gray-600">Inbound Duration:</span>
-            <div className="font-medium">{formatMinutesToHours(item.call_data?.total_inbound_call_minutes || 0)}</div>
+            <div className="font-medium">{formatMinutesToHours(item.call_data?.total_inbound_call_duration || 0)}</div>
           </div>
           <div>
             <span className="text-gray-600">Outbound Duration:</span>
-            <div className="font-medium">{formatMinutesToHours(item.call_data?.total_outbound_call_minutes || 0)}</div>
+            <div className="font-medium">{formatMinutesToHours(item.call_data?.total_outbound_call_duration || 0)}</div>
           </div>
         </div>
         <div className='flex flex-col gap-2'>
@@ -193,7 +193,7 @@ const UserDashboard = () => {
         </div>
         {viewMode === 'account' && (
           <>
-            <div className='flex flex-col gap-2'>
+            {/* <div className='flex flex-col gap-2'>
               <div>
                 <span className="text-gray-600">Inbound Rate:</span>
                 <div className="font-medium">{formatCurrency(item.call_data?.call_inbound_rate || 0)}</div>
@@ -202,7 +202,7 @@ const UserDashboard = () => {
                 <span className="text-gray-600">Outbound Rate:</span>
                 <div className="font-medium">{formatCurrency(item.call_data?.call_outbound_rate || 0)}</div>
               </div>
-            </div>
+            </div> */}
           </>
         )}
       </div>
@@ -219,7 +219,7 @@ const UserDashboard = () => {
     </div>
   );
 
-  console.log(filters, 'call');
+  console.log(data, 'call');
   
 
   return (
@@ -304,7 +304,7 @@ const UserDashboard = () => {
                   </thead>
 
                   <tbody className="divide-y divide-gray-200 bg-white">
-                    {data.map((item, idx) => (
+                    {data?.map((item, idx) => (
                       <React.Fragment key={idx}>
                         <tr className="hover:bg-gray-50 transition">
                           <td className="px-6 py-3 font-medium text-gray-900">{item?.company_name || 'Nil'}</td>
@@ -362,7 +362,7 @@ const UserDashboard = () => {
                           <td className="px-4 py-3 text-center">
                             <div className="flex items-center justify-center space-x-2">
                               <span className="font-medium text-gray-800">
-                                {formatCurrency(item.combined_totals?.total_usage)}
+                                {formatCurrency(item.combined_totals?.total_usage ?? item.combined_totals?.total_inbound_usage + item.combined_totals?.total_outbound_usage)}
                               </span>
                               <button
                                 onClick={() => toggleRowExpansion(idx, 'full')}
@@ -382,9 +382,7 @@ const UserDashboard = () => {
                             <div className="flex items-center justify-center gap-2 h-6">
                               <div className="text-purple-600 font-medium leading-none min-w-[60px] text-right">
                                 {formatCurrency(
-                                  viewMode === 'account'
-                                    ? item.combined_totals?.wallet_balance
-                                    : item.combined_totals?.total_wallet_balance || 0
+                                  item.wallet_balance
                                 )}
                               </div>
                               <button

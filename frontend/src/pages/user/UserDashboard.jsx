@@ -109,16 +109,16 @@ const UserDashboard = () => {
     <div className="bg-blue-50 p-4 rounded-lg">
       <h4 className="font-medium text-blue-900 mb-3">SMS Data Details</h4>
       <div className="flex justify-between text-sm">
-        {/* <div className='flex flex-col gap-2'>
+        <div className='flex flex-col gap-2'>
           <div>
             <span className="text-gray-600">Inbound Segments:</span>
-            <div className="font-medium">{item.sms_data?.total_inbound_segments || 0}</div>
+            <div className="font-medium">{item.sms_data?.inbound_segments || 0}</div>
           </div>
           <div>
             <span className="text-gray-600">Outbound Segments:</span>
-            <div className="font-medium">{item.sms_data?.total_outbound_segments || 0}</div>
+            <div className="font-medium">{item.sms_data?.outbound_segments || 0}</div>
           </div>
-        </div> */}
+        </div>
         <div className='flex flex-col gap-2'>
           <div>
             <span className="text-gray-600">Messages In:</span>

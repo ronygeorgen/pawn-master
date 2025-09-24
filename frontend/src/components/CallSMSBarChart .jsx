@@ -124,8 +124,10 @@ const CallSMSBarChart = ({ viewMode, global_filters }) => {
       group.total_usage += item.call_data?.total_usage || 0
     }
 
+    console.log(filters.data_type, 'filtersssss', item.sms_data);
+
     if (filters.data_type === "sms" || filters.data_type === "both") {
-      group.total_sms += item.sms_data?.total_messages || 0
+      group.total_sms += item.sms_data?.inbound_messages + item.sms_data?.outbound_messages || 0
       group.inbound_messages += item.sms_data?.inbound_messages || 0
       group.outbound_messages += item.sms_data?.outbound_messages || 0
       group.total_segments += item.sms_data?.total_segments || 0
@@ -159,7 +161,7 @@ const CallSMSBarChart = ({ viewMode, global_filters }) => {
                 <span className="font-medium text-green-900">Call Data</span>
               </div>
               <div className="grid grid-cols-2 gap-2 text-sm">
-                <div className="text-gray-600">Total: <span className="font-medium text-gray-900">{data.total_calls ?? 0}</span></div>
+                <div className="text-gray-600">Total Call: <span className="font-medium text-gray-900">{data.total_calls ?? 0}</span></div>
                 <div className="text-gray-600">Inbound: <span className="font-medium text-gray-900">{data.inbound_calls ?? 0}</span></div>
                 <div className="text-gray-600">Outbound: <span className="font-medium text-gray-900">{data.outbound_calls ?? 0}</span></div>
                 <div className="text-gray-600">Duration: <span className="font-medium text-gray-900">{data.total_duration ?? 0}s</span></div>
@@ -174,7 +176,7 @@ const CallSMSBarChart = ({ viewMode, global_filters }) => {
                 <span className="font-medium text-blue-900">SMS Data</span>
               </div>
               <div className="grid grid-cols-2 gap-2 text-sm">
-                <div className="text-gray-600">Total: <span className="font-medium text-gray-900">{data.total_sms ?? 0}</span></div>
+                <div className="text-gray-600">Total SMS: <span className="font-medium text-gray-900">{data.total_sms ?? 0}</span></div>
                 <div className="text-gray-600">Inbound: <span className="font-medium text-gray-900">{data.inbound_messages ?? 0}</span></div>
                 <div className="text-gray-600">Outbound: <span className="font-medium text-gray-900">{data.outbound_messages ?? 0}</span></div>
                 <div className="text-gray-600">Segments: <span className="font-medium text-gray-900">{data.total_segments ?? 0}</span></div>

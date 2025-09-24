@@ -37,7 +37,7 @@ const getDefaultDateRange = () => {
 
     const today = new Date();
     const pastDate = new Date();
-    pastDate.setFullYear(today.getFullYear() - 1);
+    pastDate.setMonth(today.getMonth() - 6);
 
   return {
     start: pastDate,

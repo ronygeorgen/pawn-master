@@ -22,8 +22,8 @@ class UserDataService {
       };
       
       const now = new Date();
-      const fiveYearsAgo = new Date();
-      fiveYearsAgo.setFullYear(now.getFullYear() - 1);
+      const sixMonthsAgo = new Date();
+      sixMonthsAgo.setMonth(now.getMonth() - 6);
 
       console.log('Filters from service:', filters);
       console.log('ViewMode from service:', viewMode);
@@ -31,7 +31,7 @@ class UserDataService {
       const payload = {
         view_type: viewMode,
         date_range: {
-          start: formatToYMD(filters?.dateRange?.start, fiveYearsAgo),
+          start: formatToYMD(filters?.dateRange?.start, sixMonthsAgo),
           end: formatToYMD(filters?.dateRange?.end, now),
         },
         // Fix category handling - check for both id and category_name

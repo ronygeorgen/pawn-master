@@ -78,9 +78,11 @@ const userDataSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchUserData.fulfilled, (state, action) => {
-        console.log(action.payload, 'data')
         state.loading = false;
-        state.data = action.payload.results;
+        const {viewMode} = action.meta.arg
+        if (state.viewMode === viewMode){
+          state.data = action.payload.results;
+        }
         state.count = action.payload.count;
         state.next = action.payload.next;
         state.previous = action.payload.previous;

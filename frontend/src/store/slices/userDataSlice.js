@@ -92,17 +92,21 @@ const userDataSlice = createSlice({
       })
 
       .addCase(refreshWallet.fulfilled, (state, action) => {
-        const locationId = action.meta.arg;
+        const { id, query_name } = action.meta.arg;
         state.loading = false;
-        console.log(action?.payload, 'payload', locationId);
         
         state.data = state.data.map((item) => {
-          if (item?.location_id === locationId) {
+          const match = query_name === 'location_id'
+            ? item?.location_id === id
+            : item?.company_id === id;
+
+          if (match) {
             return {
               ...item,
-              current_balance: action?.payload?.details?.current_balance,
+              wallet_balance: action?.payload?.details[0]?.current_balance,
             };
           }
+
           return item;
         });
         state.success = true;

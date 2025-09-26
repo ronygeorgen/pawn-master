@@ -78,15 +78,15 @@ const userDataSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchUserData.fulfilled, (state, action) => {
-        state.loading = false;
         const {viewMode} = action.meta.arg
         if (state.viewMode === viewMode){
+          state.loading = false;
           state.data = action.payload.results;
+          state.count = action.payload.count;
+          state.next = action.payload.next;
+          state.previous = action.payload.previous;
+          state.currentPage = action.meta.arg.page || 1;
         }
-        state.count = action.payload.count;
-        state.next = action.payload.next;
-        state.previous = action.payload.previous;
-        state.currentPage = action.meta.arg.page || 1;
       })
       .addCase(fetchUserData.rejected, (state, action) => {
         state.loading = false;
